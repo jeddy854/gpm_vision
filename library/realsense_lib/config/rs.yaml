@@ -1,0 +1,7 @@
+config:
+  device_type: 0
+  camera_id: 0
+  serial_id: 00000000f0090172
+  stream_configs:
+    - {stream: 1, width: 1024, height: 768, format: 0, framerate: 0}
+    - {stream: 2, width: 1280, height: 720, format: 0, framerate: 0}
