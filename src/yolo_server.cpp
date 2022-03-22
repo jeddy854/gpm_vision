@@ -1,11 +1,11 @@
 #include "yolo_server.h"
 
-Yolo *Yolo::inst_ = nullptr;
-Yolo *Yolo::getYolo()
+Yolo *Yolo::inst = nullptr;
+Yolo *Yolo::GetYolo()
 {
-    if (inst_ == nullptr)
-        inst_ = new Yolo();
-    return inst_;
+    if (inst == nullptr)
+        inst = new Yolo();
+    return inst;
 }
 Yolo::Yolo()
 {

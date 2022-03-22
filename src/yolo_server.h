@@ -12,7 +12,7 @@ class Yolo
 {
     public:
         static Yolo *GetYolo();
-        ~Yolo(){ inst_ = nullptr; };
+        ~Yolo(){ inst = nullptr; };
         cv::Mat Get_RGBimage();
 
     /* Get realsense d435i rgb and depth image*/
@@ -27,10 +27,10 @@ class Yolo
         void IntelD435i_DepthCb(const sensor_msgs::ImageConstPtr &msg);
         void IntelD435i_ImageCb(const sensor_msgs::ImageConstPtr &msg);
         void IntelD435i_CalibCb(const sensor_msgs::CameraInfo &msg);
-        thread *ros_thread;
+        std::thread *ros_thread;
     
     private:
-        static Yolo *inst_;
+        static Yolo *inst;
         yolo();
         cv::Mat img_from_camera;
         cv::Mat depth_from_camera;
@@ -43,5 +43,5 @@ class Yolo
         float k3;
         float p1;
         float p2;
-}   
+}; 
 #endif
