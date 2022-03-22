@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.0.2)
 project(process)
 add_compile_options(-std=c++14)
 
+set(OpenCV_STATIC OFF CACHE BOOL "Using OpenCV static linking library")
+find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -13,10 +16,6 @@ find_package(catkin REQUIRED COMPONENTS
   nodelet
 )
 include_directories(${catkin_INCLUDE_DIRS})
-
-set(OpenCV_STATIC OFF CACHE BOOL "Using OpenCV static linking library")
-find_package(OpenCV REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})
 
 find_path(DARKNET_INCLUDE_DIRS yolo_v2_class.hpp
     "/usr/include"
