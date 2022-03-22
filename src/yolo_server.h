@@ -18,6 +18,7 @@ class Yolo
     /* Get realsense d435i rgb and depth image*/
     /* ROS */
     private:
+        image_transport::ImageTransport it_;
         ros::NodeHandle n_;
         void InitialRos(void);
         void Ros_spin(void);
