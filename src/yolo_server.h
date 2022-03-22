@@ -1,5 +1,6 @@
 #ifndef YOLO_SERVER
 #define YOLO_SERVER
+#include <thread>
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/image_encodings.h>
@@ -17,7 +18,7 @@ class Yolo
     /* Get realsense d435i rgb and depth image*/
     /* ROS */
     private:
-        ros::NodeHandel n;
+        ros::NodeHandle n;
         void InitialRos(void);
         void Ros_spin(void);
         image_transport::Subscriber image_sub;
