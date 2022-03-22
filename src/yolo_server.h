@@ -12,12 +12,13 @@ class Yolo
 {
     public:
         static Yolo *GetYolo(void);
-        ~Yolo();
+        ~Yolo(void);
         cv::Mat Get_RGBimage(void);
 
     /* Get realsense d435i rgb and depth image*/
     /* ROS */
     private:
+        ros::NodeHandle ni_;
         image_transport::ImageTransport it_;
         ros::NodeHandle n_;
         void InitialRos(void);

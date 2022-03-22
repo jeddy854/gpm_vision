@@ -7,7 +7,7 @@ Yolo *Yolo::GetYolo()
         inst = new Yolo();
     return inst;
 }
-Yolo::Yolo()
+Yolo::Yolo() : it_(ni_)
 {
     InitialRos();
 }
