@@ -11,9 +11,9 @@
 class Yolo
 {
     public:
-        static Yolo *GetYolo();
+        static Yolo *GetYolo(void);
         ~Yolo(){ inst = nullptr; };
-        cv::Mat Get_RGBimage();
+        cv::Mat Get_RGBimage(void);
 
     /* Get realsense d435i rgb and depth image*/
     /* ROS */
@@ -31,7 +31,7 @@ class Yolo
     
     private:
         static Yolo *inst;
-        yolo();
+        Yolo(void);
         cv::Mat img_from_camera;
         cv::Mat depth_from_camera;
         float fx;
