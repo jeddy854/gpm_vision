@@ -11,7 +11,7 @@ int main(int argc, char *argv[]){
     {
         colorimage = yolov4->Get_RGBimage();
         cv::imshow("Color Image", colorimage);
-        wiatKey(30);
+        waitKey(30);
     }
     return 0;
 }
