@@ -13,7 +13,7 @@ int main(int argc, char *argv[]){
     cv::Mat img_from_camera;
     while(true)
     {         
-        std::vertor<bbox_t> predict_result;
+        std::vector<bbox_t> predict_result;
         if(yolov4->GetImageSubstate()) 
         {
             img_from_camera = yolov4->Get_RGBimage();
@@ -24,7 +24,7 @@ int main(int argc, char *argv[]){
                 drawBoundingBox(img_from_camera, p);
             }
             cv::imshow("Color Image", img_from_camera);
-            waitKey(30);
+            cv::waitKey(30);
         }
     }
     return 0;
