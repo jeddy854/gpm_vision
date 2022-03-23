@@ -10,9 +10,7 @@ Yolo *Yolo::GetYolo()
 Yolo::Yolo() 
 : it_(ni_),
   image_sub_flag(false)
-
 {
-    detector =  Detector("~/model/yolov4/yolov4-tiny.cfg","~/model/yolov4/yolov4-tiny.weights");
     InitialRos();
 }
 

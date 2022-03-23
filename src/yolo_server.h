@@ -20,7 +20,7 @@ class Yolo
         ~Yolo(void);
         cv::Mat Get_RGBimage(void);
         bool GetImageSubstate(void);
-        Detector detector;
+        Detector detector("~/model/yolov4/yolov4-tiny.cfg","~/model/yolov4/yolov4-tiny.weights");
     /* Get realsense d435i rgb and depth image*/
     /* ROS */
     private:
