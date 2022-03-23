@@ -11,7 +11,7 @@ Yolo::Yolo()
 : it_(ni_),
   image_sub_flag(false)
 {
-    detector = new Detector("/home/vision2/May_ws/yolo_v4/yolov4-tiny.cfg", "/home/vision2/May_ws/yolo_v4/yolov4-tiny.weights");
+    detector = new Detector("/home/vision2/model/yolo_v4/yolov4-tiny.cfg", "/home/vision2/model/yolo_v4/yolov4-tiny.weights");
     InitialRos();
 }
 
