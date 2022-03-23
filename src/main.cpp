@@ -23,14 +23,14 @@ int main(int argc, char *argv[]){
             {
                 drawBoundingBox(img_from_camera, p);
             }
-            // cv::imshow("Color Image", img_from_camera);
-            // cv::waitKey(30);
+            cv::imshow("Color Image", img_from_camera);
+            cv::waitKey(30);
         }
     }
     return 0;
 }
 /** Draw a bounding box onto a Mat, include drawing it's class name. */
-void drawBoundingBox(cv::Mat image, bbox_t boundingBox) {
+void drawBoundingBox(cv::Mat& image, bbox_t boundingBox) {
     cv::Rect rect(boundingBox.x, boundingBox.y, boundingBox.w, boundingBox.h);
     // Random select a color of bounding box
     int r = 50 + ((43 * (boundingBox.obj_id + 1)) % 150);

@@ -35,7 +35,6 @@ void Yolo::Ros_spin()
     {   
         ros::spinOnce();
         std::this_thread::sleep_for(std::chrono::milliseconds(int(100)));
-        std::cout<< this->img_from_camera.rows<<"  "<<this->img_from_camera.cols<<std::endl;
     }
 }
 
