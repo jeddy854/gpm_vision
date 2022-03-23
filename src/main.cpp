@@ -1,7 +1,7 @@
 #include "yolo_server.h"
 #include <iostream>
 
-void drawBoundingBox(cv::Mat image, bbox_t boundingBox);
+void drawBoundingBox(cv::Mat& image, bbox_t boundingBox);
 
 int main(int argc, char *argv[]){
     ros::init(argc, argv, "yolo1");
