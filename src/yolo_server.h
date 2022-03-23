@@ -8,9 +8,9 @@
 #include <cv_bridge/cv_bridge.h>
 #include <chrono>
 #include <vector>
+#define OPENCV
 #include "yolo_v2_class.hpp"
 #include <iostream>
-#define OPENCV
 using namespace std;
 
 class Yolo
