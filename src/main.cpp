@@ -16,7 +16,7 @@ int main(int argc, char *argv[]){
         {
             img_from_camera = yolov4->Get_RGBimage();
             cout<<img_from_camera.rows<<"  "<<img_from_camera.cols<<endl;
-            predict_result = yolov4->detector->detect(img_from_camera, thresh = 0.5);
+            predict_result = yolov4->detector.detect(img_from_camera, thresh = 0.5);
             for (auto p : predict_result) 
             {
                 drawBoundingBox(img_from_camera, p);
