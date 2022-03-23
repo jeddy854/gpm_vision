@@ -6,7 +6,9 @@
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
-// #include "yolo_v2_class.hpp"
+#include <chrono>
+#include <vector>
+#include "yolo_v2_class.hpp"
 
 class Yolo
 {
@@ -15,7 +17,7 @@ class Yolo
         ~Yolo(void);
         cv::Mat Get_RGBimage(void);
         bool GetImageSubstate(void);
-        
+        Detector *detector;
     /* Get realsense d435i rgb and depth image*/
     /* ROS */
     private:
