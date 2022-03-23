@@ -23,8 +23,8 @@ int main(int argc, char *argv[]){
             {
                 drawBoundingBox(img_from_camera, p);
             }
-            cv::imshow("Color Image", img_from_camera);
-            cv::waitKey(30);
+            // cv::imshow("Color Image", img_from_camera);
+            // cv::waitKey(30);
         }
     }
     return 0;
