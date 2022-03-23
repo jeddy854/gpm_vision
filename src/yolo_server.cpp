@@ -1,5 +1,4 @@
 #include "yolo_server.h"
-#include <iostream>
 
 Yolo *Yolo::inst = nullptr;
 Yolo *Yolo::GetYolo()

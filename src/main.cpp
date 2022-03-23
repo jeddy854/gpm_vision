@@ -1,8 +1,6 @@
 #include "yolo_server.h"
 #include <iostream>
 
-using namespace std;
-
 void drawBoundingBox(cv::Mat image, bbox_t boundingBox);
 
 int main(int argc, char *argv[]){

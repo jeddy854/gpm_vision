@@ -9,6 +9,9 @@
 #include <chrono>
 #include <vector>
 #include "yolo_v2_class.hpp"
+#include <iostream>
+
+using namespace std;
 
 class Yolo
 {
