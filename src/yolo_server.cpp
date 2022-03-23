@@ -29,9 +29,12 @@ void Yolo::InitialRos()
 }
 
 void Yolo::Ros_spin()
-{
-    ros::spinOnce();
-    std::this_thread::sleep_for(std::chrono::milliseconds(int(100)));
+{   
+    while(true)
+    {
+        ros::spinOnce();
+        std::this_thread::sleep_for(std::chrono::milliseconds(int(100)));
+    }
 }
 
 void Yolo::IntelD435i_ImageCb(const sensor_msgs::ImageConstPtr &msg)
