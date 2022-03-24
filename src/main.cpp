@@ -1,22 +1,22 @@
 #include "yolo_server.h"
-#include <iostream>
-
+cv::Mat img_from_camera;
+cv::Mat depth_from_camera;
+Intrinsic_Matrix intrin;
 void drawBoundingBox(cv::Mat& image, bbox_t boundingBox);
 
 int main(int argc, char *argv[]){
     ros::init(argc, argv, "yolo1");
     Yolo *yolov4;
     yolov4 = Yolo::GetYolo();
-
-    cv::Mat img_from_camera;
     while(true)
     {         
         std::vector<bbox_t> predict_result;
-        if(yolov4->GetImageSubstate()) 
+        if(yolov4->GetAllDataSubstate()) 
         {
             img_from_camera = yolov4->Get_RGBimage();
-            // cout<<img_from_camera.rows<<"  "<<img_from_camera.cols<<endl;
-            predict_result = yolov4->detector->detect(img_from_camera, 0.5);
+            depth_from_camera = yolov4->Get_Depthimage();
+            yolov4->Get_CameraIntrin(intrin);
+            predict_result = yolov4->detector->detect(img_from_camera, 0.3);
 
             cout<<predict_result.size()<<endl;
             for (auto p : predict_result) 
@@ -38,6 +38,19 @@ void drawBoundingBox(cv::Mat& image, bbox_t boundingBox) {
     int b = 50 + ((37 * (boundingBox.obj_id + 1)) % 150);
     cv::Scalar color(b, g, r);
     cv::rectangle(image, rect, color, 2);
-    cv::putText(image, to_string(boundingBox.obj_id),
+    float depth = depth_from_camera.at<float>(boundingBox.y+boundingBox.h/2,boundingBox.x+boundingBox.w/2);
+    if(depth>0)
+    {
+        boundingBox.z_3d = depth;
+        boundingBox.x_3d = ((boundingBox.x+boundingBox.w/2-intrin.cx)/intrin.fx)*depth;
+        boundingBox.y_3d = ((boundingBox.y+boundingBox.h/2-intrin.cy)/intrin.fy)*depth;
+    }
+    else 
+    {
+        boundingBox.z_3d = 0;
+        boundingBox.x_3d = 0;
+        boundingBox.y_3d = 0;
+    }
+    cv::putText(image, "( "+to_string(boundingBox.x_3d)+" "+to_string(boundingBox.y_3d)+" "+to_string(boundingBox.z_3d)+" )",
                 rect.tl() + cv::Point(0, 20), 0, 0.7, color, 2);
 }
