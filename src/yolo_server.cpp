@@ -13,7 +13,7 @@ Yolo::Yolo()
   depth_sub_flag(false),
   calib_sub_flag(false)
 {
-    detector = new Detector("/home/vision1/model/yolo_v4/yolov4-tiny.cfg", "/home/vision1/model/yolo_v4/yolov4-tiny.weights");
+    detector = new Detector("/home/gpm-server/model/yolo_v4/yolov4-tiny.cfg", "/home/gpm-server/model/yolo_v4/yolov4-tiny.weights");
     InitialRos();
 }
 
@@ -25,10 +25,11 @@ Yolo::~Yolo()
 }
 
 void Yolo::InitialRos()
-{
+{   
     this->image_sub = this->it_.subscribe("/camera/color/image_raw", 1, &Yolo::IntelD435i_ImageCb, this);
     this->depth_sub = this->it_.subscribe("/camera/aligned_depth_to_color/image_raw", 1, &Yolo::IntelD435i_DepthCb, this);
     this->calib_sub = this->n_.subscribe("/camera/color/camera_info", 1, &Yolo::IntelD435i_CalibCb, this);
+    this->result_pub = this->n_.advertise<process::Yolo_result>("yolo_result",1);
     ros_thread = new std::thread(&Yolo::Ros_spin,this);
 }
 
@@ -39,6 +40,11 @@ void Yolo::Ros_spin()
         ros::spinOnce();
         std::this_thread::sleep_for(std::chrono::milliseconds(int(100)));
     }
+}
+
+void Yolo::Result_Pub(process::Yolo_result result)
+{
+    this->result_pub.publish(result);
 }
 
 void Yolo::IntelD435i_ImageCb(const sensor_msgs::ImageConstPtr &msg)

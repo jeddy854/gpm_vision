@@ -12,8 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
-
   genmsg
+  message_generation
   image_transport 
   cv_bridge 
   nodelet
@@ -28,13 +28,13 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 find_path(DARKNET_INCLUDE_DIRS yolo_v2_class.hpp
     "/usr/include"
     "/usr/local/include"
-    "/home/vision1/api/darknet/include"
+    "/home/gpm-server/api/darknet/include"
     )
 
 find_library(DARKNET_LIBRARIES libdarknet.so
     "/usr/lib"
     "/usr/local/lib"
-    "/home/vision1/api/darknet"
+    "/home/gpm-server/api/darknet"
     )
 
 include_directories(
@@ -77,11 +77,10 @@ include_directories(
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+  FILES
+  Yolo_result.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -131,7 +130,9 @@ include_directories(
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
+catkin_package(  CATKIN_DEPENDS 
+message_runtime
+std_msgs
 #  INCLUDE_DIRS include
 #  LIBRARIES fsm_struct
 #  CATKIN_DEPENDS roscpp rospy std_msgs
@@ -159,13 +160,12 @@ catkin_package(
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/fsm_struct_node.cpp)
 
-
 include_directories(src)
 
 add_executable(yolo_server src/yolo_server.cpp src/main.cpp)
 
 target_link_libraries(yolo_server ${DARKNET_LIBRARIES} ${OpenCV_LIBS} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-
+add_dependencies(yolo_server ${process_EXPORTED_TARGETS} )
 #add_dependencies(yolo_server ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
 
