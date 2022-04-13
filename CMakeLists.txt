@@ -87,7 +87,7 @@ include_directories(
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
-  Yolo_result.msg
+  # Yolo_result.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -173,7 +173,7 @@ include_directories(src)
 add_executable(yolo_server src/yolo_server.cpp src/main.cpp)
 
 target_link_libraries(yolo_server ${DARKNET_LIBRARIES} ${OpenCV_LIBS} ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${POCO_LIBS})
-add_dependencies(yolo_server ${process_EXPORTED_TARGETS} )
+# add_dependencies(yolo_server ${process_EXPORTED_TARGETS} )
 #add_dependencies(yolo_server ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
 
