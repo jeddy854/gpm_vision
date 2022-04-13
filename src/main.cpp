@@ -59,8 +59,8 @@ void drawBoundingBox(cv::Mat& image, bbox_t& boundingBox) {
     float depth = depth_from_camera.at<float>(boundingBox.y+boundingBox.h/2,boundingBox.x+boundingBox.w/2);
     if(depth>0)
     {
-        boundingBox.z_3d = depth;
-        boundingBox.x_3d = ((boundingBox.x+boundingBox.w/2-intrin.cx)/intrin.fx)*depth;
+        boundingBox.z_3d = depth-4.1;
+        boundingBox.x_3d = ((boundingBox.x+boundingBox.w/2-intrin.cx)/intrin.fx)*depth-32.5;
         boundingBox.y_3d = ((boundingBox.y+boundingBox.h/2-intrin.cy)/intrin.fy)*depth;
     }
     else 
