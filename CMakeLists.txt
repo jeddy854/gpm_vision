@@ -12,8 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
-  genmsg
-  message_generation
+  # genmsg
+  # message_generation
   image_transport 
   cv_bridge 
   nodelet
@@ -85,10 +85,10 @@ include_directories(
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  # Yolo_result.msg
-)
+# add_message_files(
+#   FILES
+# Yolo_result.msg
+# )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -104,10 +104,10 @@ add_message_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
- generate_messages(
-   DEPENDENCIES
-   std_msgs
- )
+#  generate_messages(
+#   #  DEPENDENCIES
+#   #  std_msgs
+#  )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -139,8 +139,8 @@ add_message_files(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(  CATKIN_DEPENDS 
-message_runtime
-std_msgs
+# message_runtime
+# std_msgs
 #  INCLUDE_DIRS include
 #  LIBRARIES fsm_struct
 #  CATKIN_DEPENDS roscpp rospy std_msgs
