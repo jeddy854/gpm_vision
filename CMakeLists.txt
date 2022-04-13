@@ -19,6 +19,13 @@ find_package(catkin REQUIRED COMPONENTS
   nodelet
 )
 
+set(POCO_INCLUDE_DIR "/usr/local/include")
+set(POCO_LIBS 
+  "/usr/local/lib/libPocoNet.so"
+  "/usr/local/lib/libPocoNet.so.81"
+  "/usr/local/lib/libPocoFoundation.so"
+  "/usr/local/lib/libPocoFoundation.so.81")
+
 include_directories(${catkin_INCLUDE_DIRS})
 
 set(OpenCV_STATIC OFF CACHE BOOL "Using OpenCV static linking library")
@@ -28,19 +35,20 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 find_path(DARKNET_INCLUDE_DIRS yolo_v2_class.hpp
     "/usr/include"
     "/usr/local/include"
-    "/home/gpm-server/api/darknet/include"
+    "/home/vision1/api/darknet/include"
     )
 
 find_library(DARKNET_LIBRARIES libdarknet.so
     "/usr/lib"
     "/usr/local/lib"
-    "/home/gpm-server/api/darknet"
+    "/home/vision1/api/darknet"
     )
 
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
   ${DARKNET_INCLUDE_DIRS}
+  ${POCO_INCLUDE_DIR}
   )
 
 ## System dependencies are found with CMake's conventions
@@ -164,7 +172,7 @@ include_directories(src)
 
 add_executable(yolo_server src/yolo_server.cpp src/main.cpp)
 
-target_link_libraries(yolo_server ${DARKNET_LIBRARIES} ${OpenCV_LIBS} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(yolo_server ${DARKNET_LIBRARIES} ${OpenCV_LIBS} ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${POCO_LIBS})
 add_dependencies(yolo_server ${process_EXPORTED_TARGETS} )
 #add_dependencies(yolo_server ${${PROJECT_NAME}_EXPORTED_TARGETS})
 

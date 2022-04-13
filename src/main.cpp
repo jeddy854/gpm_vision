@@ -1,43 +1,42 @@
 #include "yolo_server.h"
+#include <Poco/Net/SocketStream.h>
+#include <Poco/Net/StreamSocket.h>
+#include <Poco/Net/ServerSocket.h>
+#include <string>
 cv::Mat img_from_camera;
 cv::Mat depth_from_camera;
 Intrinsic_Matrix intrin;
-process::Yolo_result result;
+// process::Yolo_result result;
 void drawBoundingBox(cv::Mat& image, bbox_t& boundingBox);
 
 int main(int argc, char *argv[]){
     ros::init(argc, argv, "yolo1");
     Yolo *yolov4;
     yolov4 = Yolo::GetYolo();
+    Poco::Net::ServerSocket srv(3000);
     while(true)
     {         
         std::vector<bbox_t> predict_result;
         if(yolov4->GetAllDataSubstate()) 
         {
+            cout<<"Get Ready."<<endl;
+            Poco::Net::StreamSocket socket = srv.acceptConnection();
+            Poco::Net::SocketStream stream(socket);
+            cout<<"Accept Connection."<<endl;
             img_from_camera = yolov4->Get_RGBimage();
             depth_from_camera = yolov4->Get_Depthimage();
             yolov4->Get_CameraIntrin(intrin);
             predict_result = yolov4->detector->detect(img_from_camera, 0.3);
-
             cout<<predict_result.size()<<endl;
             if(predict_result.size()<1) continue;
             for (auto p : predict_result) 
             {   
-                result.x.push_back(p.x);
-                result.y.push_back(p.y);
-                result.w.push_back(p.w);
-                result.h.push_back(p.h);
-                result.prob.push_back(p.prob);
-                result.obj_id.push_back(p.obj_id);
                 drawBoundingBox(img_from_camera, p);
+                stream << to_string(p.obj_id)+" "+to_string(p.x_3d)+" "+to_string(p.y_3d)+" "+to_string(p.z_3d)+" ";
+                cout << p.obj_id<<" "<<p.x_3d<<" "<<p.y_3d<<" "<<p.z_3d<<endl;
             }
-            yolov4->Result_Pub(result);
-            result.x.clear();
-            result.y.clear();
-            result.w.clear();
-            result.h.clear();
-            result.prob.clear();
-            result.obj_id.clear();
+            stream.flush();
+            socket.shutdownSend();
             #ifdef DRAWING
             cv::imshow("Color Image", img_from_camera);
             cv::waitKey(30);

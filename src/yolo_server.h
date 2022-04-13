@@ -6,7 +6,6 @@
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
-#include "process/Yolo_result.h" 
 #include <chrono>
 #include <vector>
 #define OPENCV
@@ -26,7 +25,6 @@ class Yolo
     public:
         static Yolo *GetYolo(void);
         ~Yolo(void);
-        void Result_Pub(process::Yolo_result result);
         cv::Mat Get_RGBimage(void);
         cv::Mat Get_Depthimage(void);
         void Get_CameraIntrin(Intrinsic_Matrix& intrin);
@@ -43,7 +41,6 @@ class Yolo
         image_transport::Subscriber image_sub;
         image_transport::Subscriber depth_sub;
         ros::Subscriber calib_sub;
-        ros::Publisher result_pub;
         bool image_sub_flag;
         bool depth_sub_flag;
         bool calib_sub_flag;
