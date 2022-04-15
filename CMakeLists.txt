@@ -35,13 +35,13 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 find_path(DARKNET_INCLUDE_DIRS yolo_v2_class.hpp
     "/usr/include"
     "/usr/local/include"
-    "/home/gpm-server/api/darknet/include"
+    "/home/vision1/api/darknet/include"
     )
 
 find_library(DARKNET_LIBRARIES libdarknet.so
     "/usr/lib"
     "/usr/local/lib"
-    "/home/gpm-server/api/darknet"
+    "/home/vision1/api/darknet"
     )
 
 include_directories(

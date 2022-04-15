@@ -28,26 +28,26 @@ Yolo::~Yolo()
     
     if(detector)
 	delete(detector);
-    // ros_thread->join();
-    // delete ros_thread;
+    ros_thread->join();
+    delete ros_thread;
 }
 
 void Yolo::InitialRos()
 {   
     this->image_sub = this->it_.subscribe("/camera/color/image_raw", 1, &Yolo::IntelD435i_ImageCb, this);
-    this->depth_sub = this->it_.subscribe("/camera/aligned_depth_to_color/image_raw", 1, &Yolo::IntelD435i_DepthCb, this);
+    this->depth_sub = this->it_.subscribe("/camera/depth/image_rect_raw", 1, &Yolo::IntelD435i_DepthCb, this);
     this->calib_sub = this->n_.subscribe("/camera/color/camera_info", 1, &Yolo::IntelD435i_CalibCb, this);
-    // ros_thread = new std::thread(&Yolo::Ros_spin,this);
+    ros_thread = new std::thread(&Yolo::Ros_spin,this);
 }
 
-// void Yolo::Ros_spin()
-// {   
-//     while(true)
-//     {   
-//         ros::spinOnce();
-//         std::this_thread::sleep_for(std::chrono::milliseconds(int(100)));
-//     }
-// }
+void Yolo::Ros_spin()
+{   
+    while(true)
+    {   
+        ros::spinOnce();
+        std::this_thread::sleep_for(std::chrono::milliseconds(int(100)));
+    }
+}
 
 void Yolo::IntelD435i_ImageCb(const sensor_msgs::ImageConstPtr &msg)
 {
@@ -58,6 +58,7 @@ void Yolo::IntelD435i_ImageCb(const sensor_msgs::ImageConstPtr &msg)
         cv_ptr->image.copyTo(this->img_from_camera);
         if(this->img_from_camera.rows > 0) image_sub_flag = true;
         else image_sub_flag = false;
+        // cout << "image_sub_flag: " << image_sub_flag << endl;
     }
     catch (cv_bridge::Exception &e)
     {
@@ -75,6 +76,7 @@ void Yolo::IntelD435i_DepthCb(const sensor_msgs::ImageConstPtr &msg)
         this->depth_from_camera = cv_ptr->image.clone();
         if(this->img_from_camera.rows > 0) depth_sub_flag = true;
         else depth_sub_flag = false;
+        // cout << "depth_sub_flag: " << depth_sub_flag << endl;
     }
     catch (cv_bridge::Exception &e)
     {
@@ -93,6 +95,7 @@ void Yolo::IntelD435i_CalibCb(const sensor_msgs::CameraInfo &msg)
         this->intrin.cy = msg.K[5];
         if(intrin.fx>0 && intrin.fy>0 && intrin.cx>0 && intrin.cy>0) calib_sub_flag = true;
         else calib_sub_flag = false;
+        // cout << "calib_sub_flag: " << calib_sub_flag << endl;
     }
     catch (const std::exception &e)
     {
