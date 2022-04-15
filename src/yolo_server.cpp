@@ -1,5 +1,8 @@
 #include "yolo_server.h"
 
+using namespace std;
+using namespace cv;
+
 Yolo *Yolo::inst = nullptr;
 Yolo *Yolo::GetYolo()
 {
@@ -19,9 +22,14 @@ Yolo::Yolo()
 
 Yolo::~Yolo()
 {
-    inst = nullptr;
-    ros_thread->join();
-    delete ros_thread;
+    //inst = nullptr;
+    if(inst)
+	delete(inst);
+    
+    if(detector)
+	delete(detector);
+    // ros_thread->join();
+    // delete ros_thread;
 }
 
 void Yolo::InitialRos()
@@ -29,17 +37,17 @@ void Yolo::InitialRos()
     this->image_sub = this->it_.subscribe("/camera/color/image_raw", 1, &Yolo::IntelD435i_ImageCb, this);
     this->depth_sub = this->it_.subscribe("/camera/aligned_depth_to_color/image_raw", 1, &Yolo::IntelD435i_DepthCb, this);
     this->calib_sub = this->n_.subscribe("/camera/color/camera_info", 1, &Yolo::IntelD435i_CalibCb, this);
-    ros_thread = new std::thread(&Yolo::Ros_spin,this);
+    // ros_thread = new std::thread(&Yolo::Ros_spin,this);
 }
 
-void Yolo::Ros_spin()
-{   
-    while(true)
-    {   
-        ros::spinOnce();
-        std::this_thread::sleep_for(std::chrono::milliseconds(int(100)));
-    }
-}
+// void Yolo::Ros_spin()
+// {   
+//     while(true)
+//     {   
+//         ros::spinOnce();
+//         std::this_thread::sleep_for(std::chrono::milliseconds(int(100)));
+//     }
+// }
 
 void Yolo::IntelD435i_ImageCb(const sensor_msgs::ImageConstPtr &msg)
 {

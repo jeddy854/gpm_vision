@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.0.2)
 project(process)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++14)
-
+add_compile_options(-std=c++14 -g) 
+set(CMAKE_BUILD_TYPE Debug)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -12,19 +12,19 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
-  # genmsg
-  # message_generation
   image_transport 
   cv_bridge 
   nodelet
 )
+#
+#set(POCO_INCLUDE_DIR "/usr/local/include")
+#set(POCO_LIBS 
+#  "/usr/local/lib/libPocoNet.so"
+#  "/usr/local/lib/libPocoNet.so.81"
+#  "/usr/local/lib/libPocoFoundation.so"
+#  "/usr/local/lib/libPocoFoundation.so.81")
 
-set(POCO_INCLUDE_DIR "/usr/local/include")
-set(POCO_LIBS 
-  "/usr/local/lib/libPocoNet.so"
-  "/usr/local/lib/libPocoNet.so.81"
-  "/usr/local/lib/libPocoFoundation.so"
-  "/usr/local/lib/libPocoFoundation.so.81")
+find_package(Poco COMPONENTS Net)
 
 include_directories(${catkin_INCLUDE_DIRS})
 
@@ -35,13 +35,13 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 find_path(DARKNET_INCLUDE_DIRS yolo_v2_class.hpp
     "/usr/include"
     "/usr/local/include"
-    "/home/vision1/api/darknet/include"
+    "/home/gpm-server/api/darknet/include"
     )
 
 find_library(DARKNET_LIBRARIES libdarknet.so
     "/usr/lib"
     "/usr/local/lib"
-    "/home/vision1/api/darknet"
+    "/home/gpm-server/api/darknet"
     )
 
 include_directories(
@@ -172,7 +172,7 @@ include_directories(src)
 
 add_executable(yolo_server src/yolo_server.cpp src/main.cpp)
 
-target_link_libraries(yolo_server ${DARKNET_LIBRARIES} ${OpenCV_LIBS} ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${POCO_LIBS})
+target_link_libraries(yolo_server ${DARKNET_LIBRARIES} ${OpenCV_LIBS} ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${Poco_LIBRARIES})
 # add_dependencies(yolo_server ${process_EXPORTED_TARGETS} )
 #add_dependencies(yolo_server ${${PROJECT_NAME}_EXPORTED_TARGETS})
 

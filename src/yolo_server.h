@@ -11,8 +11,6 @@
 #define OPENCV
 #include "yolo_v2_class.hpp"
 #include <iostream>
-using namespace cv;
-using namespace std;
 struct Intrinsic_Matrix
 {   
     float fx;
@@ -37,7 +35,7 @@ class Yolo
         image_transport::ImageTransport it_;
         ros::NodeHandle n_;
         void InitialRos(void);
-        void Ros_spin(void);
+        // void Ros_spin(void);
         image_transport::Subscriber image_sub;
         image_transport::Subscriber depth_sub;
         ros::Subscriber calib_sub;
@@ -47,9 +45,8 @@ class Yolo
         void IntelD435i_ImageCb(const sensor_msgs::ImageConstPtr &msg);
         void IntelD435i_DepthCb(const sensor_msgs::ImageConstPtr &msg);
         void IntelD435i_CalibCb(const sensor_msgs::CameraInfo &msg);
-        std::thread *ros_thread;
+        // std::thread *ros_thread;
     
-    private:
         static Yolo *inst;
         Yolo(void);
         Intrinsic_Matrix intrin;
