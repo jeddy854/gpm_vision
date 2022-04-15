@@ -43,6 +43,10 @@ int drawBoundingBox(cv::Mat& image, bbox_t& boundingBox);
 
 vector<string> getClassName(std::string fileName) {
     std::ifstream file(fileName);
+     if (!file.is_open()) 
+    {
+        cerr << "Could not open the file - '" << fileName << "'" << endl;
+    }
     std::vector<std::string> ret;
     std::string buf;
     while(std::getline(file, buf)) {
@@ -58,9 +62,9 @@ int main(int argc, char* argv[])
     yolov4 = Yolo::GetYolo();
     cout << "Get Yolo." << endl;
 
-    vector<string> names = getClassName("/home/api/darknet/data/coco.names");
+    vector<string> names = getClassName("/home/vision1/api/darknet/data/coco.names");
 
-    string filename("/home/vision1/May_ws/src/vision.txt");
+    string filename("/home/vision1/server_vision/src/vision.txt");
     std::ifstream input_file(filename, std::ios::in);
     if (!input_file.is_open()) 
     {
