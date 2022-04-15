@@ -5,7 +5,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-// #define DRAWING
+#define DRAWING
 
 
 using std::cin;                      
@@ -112,11 +112,11 @@ int main(int argc, char* argv[])
             cout << "New Connection from " << clientAddr.toString() << endl;
             // break;
         }
-        while(!yolov4->GetAllDataSubstate())
-        {
-            ros::spinOnce();
-            std::this_thread::sleep_for(std::chrono::milliseconds(int(100)));
-        }
+        // while(!yolov4->GetAllDataSubstate())
+        // {
+        //     ros::spinOnce();
+        //     std::this_thread::sleep_for(std::chrono::milliseconds(int(100)));
+        // }
         if (yolov4->GetAllDataSubstate()) 
         {
             cout << "Get Ready." << endl;
@@ -126,11 +126,6 @@ int main(int argc, char* argv[])
             yolov4->Get_CameraIntrin(intrin);
             predict_result = yolov4->detector->detect(img_from_camera, 0.1);
             cout << predict_result.size() << endl;
-            if (predict_result.size() < 1)
-            {
-                sout << "None" << endl;
-                continue;
-            }
             for (auto p : predict_result) 
             {
                 int location_label = drawBoundingBox(img_from_camera, p);
@@ -139,7 +134,11 @@ int main(int argc, char* argv[])
                 cout << names[p.obj_id] << " " << p.x_3d << " " << p.y_3d << " " << p.z_3d << endl;
                 
             }
-            sout << tmpString.str() << endl;
+            if (predict_result.size() < 1)
+            {
+                sout << "None" << endl;
+            }
+            else sout << tmpString.str() << endl;
             if (!sout) 
             {
                 client = serverSocket.acceptConnection(clientAddr);
@@ -153,7 +152,7 @@ int main(int argc, char* argv[])
         cv::line(img_from_camera, cv::Point(max_tablex, min_tabley), cv::Point(min_tablex, min_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
         cv::line(img_from_camera, cv::Point(min_tablex, min_tabley), cv::Point(min_tablex, max_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
         cv::imshow("Color Image", img_from_camera);
-        cv::waitKey(30);
+        cv::waitKey(0);
 #endif
     }
 
