@@ -152,7 +152,7 @@ int main(int argc, char* argv[])
         cv::line(img_from_camera, cv::Point(max_tablex, min_tabley), cv::Point(min_tablex, min_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
         cv::line(img_from_camera, cv::Point(min_tablex, min_tabley), cv::Point(min_tablex, max_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
         cv::imshow("Color Image", img_from_camera);
-        cv::waitKey(0);
+        cv::waitKey(3000);
 #endif
     }
 
