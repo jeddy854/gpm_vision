@@ -41,12 +41,24 @@ Intrinsic_Matrix intrin;
 
 int drawBoundingBox(cv::Mat& image, bbox_t& boundingBox);
 
+vector<string> getClassName(std::string fileName) {
+    std::ifstream file(fileName);
+    std::vector<std::string> ret;
+    std::string buf;
+    while(std::getline(file, buf)) {
+        ret.push_back(buf);
+    }
+    return ret;
+}
+
 int main(int argc, char* argv[])
 {
     ros::init(argc, argv, "yolo1");
     Yolo* yolov4;
     yolov4 = Yolo::GetYolo();
     cout << "Get Yolo." << endl;
+
+    vector<string> names = getClassName("/home/api/darknet/data/coco.names");
 
     string filename("/home/vision2/May_ws/src/vision.txt");
     std::ifstream input_file(filename, std::ios::in);
@@ -120,7 +132,7 @@ int main(int argc, char* argv[])
                 int location_label = drawBoundingBox(img_from_camera, p);
 
                 tmpString << to_string(p.obj_id) + " " + to_string(p.x_3d) + " " + to_string(p.y_3d) + " " + to_string(p.z_3d) + " " + to_string(location_label) + " ";
-                cout << p.obj_id << " " << p.x_3d << " " << p.y_3d << " " << p.z_3d << endl;
+                cout << names[p.obj_id] << " " << p.x_3d << " " << p.y_3d << " " << p.z_3d << endl;
                 
             }
             sout << tmpString.str() << endl;
