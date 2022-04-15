@@ -7,7 +7,6 @@
 #include <sstream>
 #define DRAWING
 
-
 using std::cin;                      
 using std::cout;                     
 using std::cerr;                     
@@ -24,7 +23,6 @@ using Poco::Net::SocketAddress;
 using Poco::Net::SocketInputStream;  
 using Poco::Net::SocketOutputStream; 
 using Poco::Net::StreamSocket;
-
 
 int max_tablex;
 int min_tablex;
@@ -65,6 +63,7 @@ int main(int argc, char* argv[])
     vector<string> names = getClassName("/home/vision1/api/darknet/data/coco.names");
 
     string filename("/home/vision1/May_ws/src/vision.txt");
+    //string filename("/home/vision1/server_vision/src/vision.txt");
     std::ifstream input_file(filename, std::ios::in);
     if (!input_file.is_open()) 
     {
@@ -110,19 +109,15 @@ int main(int argc, char* argv[])
         {   
             client = serverSocket.acceptConnection(clientAddr);
             cout << "New Connection from " << clientAddr.toString() << endl;
-            // break;
         }
-        // while(!yolov4->GetAllDataSubstate())
-        // {
-        //     ros::spinOnce();
-        //     std::this_thread::sleep_for(std::chrono::milliseconds(int(100)));
-        // }
+        while(!yolov4->GetAllDataSubstate()){}
         if (yolov4->GetAllDataSubstate()) 
         {
             cout << "Get Ready." << endl;
             cout << "Accept Connection." << endl;
             img_from_camera = yolov4->Get_RGBimage();
             depth_from_camera = yolov4->Get_Depthimage();
+            cout << "rows: " <<  img_from_camera.rows <<" cols: " << img_from_camera.cols <<endl;
             yolov4->Get_CameraIntrin(intrin);
             predict_result = yolov4->detector->detect(img_from_camera, 0.1);
             cout << predict_result.size() << endl;
@@ -146,16 +141,17 @@ int main(int argc, char* argv[])
                 // break;
             }
 	}
-#ifdef DRAWING
-        cv::line(img_from_camera, cv::Point(min_tablex, max_tabley), cv::Point(max_tablex, max_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
-        cv::line(img_from_camera, cv::Point(max_tablex, max_tabley), cv::Point(max_tablex, min_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
-        cv::line(img_from_camera, cv::Point(max_tablex, min_tabley), cv::Point(min_tablex, min_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
-        cv::line(img_from_camera, cv::Point(min_tablex, min_tabley), cv::Point(min_tablex, max_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
-        cv::imshow("Color Image", img_from_camera);
-        cv::waitKey(3000);
-#endif
-    }
 
+            #ifdef DRAWING
+            cv::line(img_from_camera, cv::Point(min_tablex, max_tabley), cv::Point(max_tablex, max_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
+            cv::line(img_from_camera, cv::Point(max_tablex, max_tabley), cv::Point(max_tablex, min_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
+            cv::line(img_from_camera, cv::Point(max_tablex, min_tabley), cv::Point(min_tablex, min_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
+            cv::line(img_from_camera, cv::Point(min_tablex, min_tabley), cv::Point(min_tablex, max_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
+            cv::imshow("Color Image", img_from_camera);
+            cv::waitKey(3000);
+            #endif
+	    }
+    }
     cout << "Disconnect to " << clientAddr.toString() << endl;
     return 0;
 }
