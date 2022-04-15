@@ -28,14 +28,14 @@ Yolo::~Yolo()
     
     if(detector)
 	delete(detector);
-    // ros_thread->join();
-    // delete ros_thread;
+    ros_thread->join();
+    delete ros_thread;
 }
 
 void Yolo::InitialRos()
 {   
-    this->image_sub = this->it_.subscribe("/camera/color/image_raw", 1, &Yolo::IntelD435i_ImageCb, this);
-    this->depth_sub = this->it_.subscribe("/camera/aligned_depth_to_color/image_raw", 1, &Yolo::IntelD435i_DepthCb, this);
+    this->image_sub = this->it_.subscribe("/camera/color/image_raw", 1, &Yolo::IntelD435i_ImageCb, this, image_transport::TransportHints("compressed"));
+    this->depth_sub = this->it_.subscribe("/camera/aligned_depth_to_color/image_raw", 1, &Yolo::IntelD435i_DepthCb, this, image_transport::TransportHints("compressed"));
     this->calib_sub = this->n_.subscribe("/camera/color/camera_info", 1, &Yolo::IntelD435i_CalibCb, this);
     ros_thread = new std::thread(&Yolo::Ros_spin,this);
 }

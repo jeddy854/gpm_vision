@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
 
     vector<string> names = getClassName("/home/vision1/api/darknet/data/coco.names");
 
-    string filename("/home/vision1/May_ws/src/vision.txt");
+    string filename("/home/vision1/May_ws/src/vision1.txt");
     std::ifstream input_file(filename, std::ios::in);
     if (!input_file.is_open()) 
     {
