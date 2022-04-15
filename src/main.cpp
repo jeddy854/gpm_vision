@@ -138,10 +138,7 @@ int main(int argc, char* argv[])
             {
                 client = serverSocket.acceptConnection(clientAddr);
                 cout << "New Connection from " << clientAddr.toString() << endl;
-                // break;
             }
-	}
-
             #ifdef DRAWING
             cv::line(img_from_camera, cv::Point(min_tablex, max_tabley), cv::Point(max_tablex, max_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
             cv::line(img_from_camera, cv::Point(max_tablex, max_tabley), cv::Point(max_tablex, min_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
@@ -151,7 +148,7 @@ int main(int argc, char* argv[])
             cv::waitKey(3000);
             #endif
 	    }
-    }
+	}
     cout << "Disconnect to " << clientAddr.toString() << endl;
     return 0;
 }
