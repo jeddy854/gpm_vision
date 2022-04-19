@@ -9,7 +9,7 @@
 #define OPENCV
 #include "yolo_v2_class.hpp"
 #include <iostream>
-#include <ros/ros.h>
+// #include <ros/ros.h>
 class Yolo
 {
     public:
