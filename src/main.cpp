@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
             int location_label = drawBoundingBox(img_from_camera, p);
 
             tmpString << to_string(p.obj_id) + " " + to_string(p.x_3d) + " " + to_string(p.y_3d) + " " + to_string(p.z_3d) + " " + to_string(location_label) + " ";
-            cout << names[p.obj_id] << " " << p.x_3d << " " << p.y_3d << " " << p.z_3d << endl;
+            cout << names[p.obj_id] << " " << p.x_3d << " " << p.y_3d << " " << p.z_3d <<" "<< p.obj_id <<" "<< location_label << endl;
             
         }
         if (predict_result.size() < 1)
