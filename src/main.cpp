@@ -61,11 +61,11 @@ int main(int argc, char* argv[])
     cout << "Get Yolo." << endl;
 
     // vector<string> names = getClassName("/home/gpm-server/api/darknet/data/coco.names");
-    // vector<string> names = getClassName("/home/vision1/api/darknet/data/coco.names");
-    vector<string> names = getClassName("/home/vision2/api/darknet/data/coco.names");
+    vector<string> names = getClassName("/home/vision1/api/darknet/data/coco.names");
+    // vector<string> names = getClassName("/home/vision2/api/darknet/data/coco.names");
     // string filename("/home/gpm-server/server_vision/src/vision1.txt");
-    // string filename("/home/vision1/May_ws/src/vision.txt");
-    string filename("/home/vision2/May_ws/src/vision.txt");
+    string filename("/home/vision1/May_ws/src/vision.txt");
+    // string filename("/home/vision2/May_ws/src/vision.txt");
     std::ifstream input_file(filename, std::ios::in);
     if (!input_file.is_open()) 
     {
@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
         img_from_camera = yolov4->Get_RGBimage();
         cout << "rows: " <<  img_from_camera.rows <<" cols: " << img_from_camera.cols <<endl;
         yolov4->Get_CameraIntrin(align_intrinsics);
-        predict_result = yolov4->detector->detect(img_from_camera, 0.1);
+        predict_result = yolov4->detector->detect(img_from_camera, 0.3);
         cout << predict_result.size() << endl;
         for (auto p : predict_result) 
         {
