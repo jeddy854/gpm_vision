@@ -12,8 +12,7 @@ using std::cout;
 using std::cerr;                     
 using std::endl;                     
 using std::flush;                    
-using std::getline;                  
-using std::stoi;                     
+using std::getline;                                     
 using std::string;                   
 using std::vector;
 using std::to_string;
@@ -34,8 +33,9 @@ int max_racky;
 int min_racky;
 int rack_depth;
 cv::Mat img_from_camera;
-cv::Mat depth_from_camera;
-Intrinsic_Matrix intrin;
+rs2_intrinsics align_intrinsics;
+Yolo *yolov4;
+using namespace cv;
 
 int drawBoundingBox(cv::Mat& image, bbox_t& boundingBox);
 
@@ -56,14 +56,13 @@ vector<string> getClassName(std::string fileName) {
 int main(int argc, char* argv[])
 {
     ros::init(argc, argv, "yolo1");
-    Yolo* yolov4;
     yolov4 = Yolo::GetYolo();
     cout << "Get Yolo." << endl;
 
     vector<string> names = getClassName("/home/vision1/api/darknet/data/coco.names");
 
+    // string filename("/home/gpm-server/server_vision/src/vision1.txt");
     string filename("/home/vision1/May_ws/src/vision.txt");
-    //string filename("/home/vision1/server_vision/src/vision.txt");
     std::ifstream input_file(filename, std::ios::in);
     if (!input_file.is_open()) 
     {
@@ -110,44 +109,40 @@ int main(int argc, char* argv[])
             client = serverSocket.acceptConnection(clientAddr);
             cout << "New Connection from " << clientAddr.toString() << endl;
         }
-        while(!yolov4->GetAllDataSubstate()){}
-        if (yolov4->GetAllDataSubstate()) 
+        yolov4->Realsense_stream_update();
+        cout << "Get Ready." << endl;
+        cout << "Accept Connection." << endl;
+        img_from_camera = yolov4->Get_RGBimage();
+        cout << "rows: " <<  img_from_camera.rows <<" cols: " << img_from_camera.cols <<endl;
+        yolov4->Get_CameraIntrin(align_intrinsics);
+        predict_result = yolov4->detector->detect(img_from_camera, 0.1);
+        cout << predict_result.size() << endl;
+        for (auto p : predict_result) 
         {
-            cout << "Get Ready." << endl;
-            cout << "Accept Connection." << endl;
-            img_from_camera = yolov4->Get_RGBimage();
-            depth_from_camera = yolov4->Get_Depthimage();
-            cout << "rows: " <<  img_from_camera.rows <<" cols: " << img_from_camera.cols <<endl;
-            yolov4->Get_CameraIntrin(intrin);
-            predict_result = yolov4->detector->detect(img_from_camera, 0.1);
-            cout << predict_result.size() << endl;
-            for (auto p : predict_result) 
-            {
-                int location_label = drawBoundingBox(img_from_camera, p);
+            int location_label = drawBoundingBox(img_from_camera, p);
 
-                tmpString << to_string(p.obj_id) + " " + to_string(p.x_3d) + " " + to_string(p.y_3d) + " " + to_string(p.z_3d) + " " + to_string(location_label) + " ";
-                cout << names[p.obj_id] << " " << p.x_3d << " " << p.y_3d << " " << p.z_3d << endl;
-                
-            }
-            if (predict_result.size() < 1)
-            {
-                sout << "None" << endl;
-            }
-            else sout << tmpString.str() << endl;
-            if (!sout) 
-            {
-                client = serverSocket.acceptConnection(clientAddr);
-                cout << "New Connection from " << clientAddr.toString() << endl;
-            }
-            #ifdef DRAWING
-            cv::line(img_from_camera, cv::Point(min_tablex, max_tabley), cv::Point(max_tablex, max_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
-            cv::line(img_from_camera, cv::Point(max_tablex, max_tabley), cv::Point(max_tablex, min_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
-            cv::line(img_from_camera, cv::Point(max_tablex, min_tabley), cv::Point(min_tablex, min_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
-            cv::line(img_from_camera, cv::Point(min_tablex, min_tabley), cv::Point(min_tablex, max_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
-            cv::imshow("Color Image", img_from_camera);
-            cv::waitKey(3000);
-            #endif
-	    }
+            tmpString << to_string(p.obj_id) + " " + to_string(p.x_3d) + " " + to_string(p.y_3d) + " " + to_string(p.z_3d) + " " + to_string(location_label) + " ";
+            cout << names[p.obj_id] << " " << p.x_3d << " " << p.y_3d << " " << p.z_3d << endl;
+            
+        }
+        if (predict_result.size() < 1)
+        {
+            sout << "None" << endl;
+        }
+        else sout << tmpString.str() << endl;
+        if (!sout) 
+        {
+            client = serverSocket.acceptConnection(clientAddr);
+            cout << "New Connection from " << clientAddr.toString() << endl;
+        }
+        #ifdef DRAWING
+        cv::line(img_from_camera, cv::Point(min_tablex, max_tabley), cv::Point(max_tablex, max_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
+        cv::line(img_from_camera, cv::Point(max_tablex, max_tabley), cv::Point(max_tablex, min_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
+        cv::line(img_from_camera, cv::Point(max_tablex, min_tabley), cv::Point(min_tablex, min_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
+        cv::line(img_from_camera, cv::Point(min_tablex, min_tabley), cv::Point(min_tablex, max_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
+        cv::imshow("Color Image", img_from_camera);
+        cv::waitKey(100);
+        #endif
 	}
     cout << "Disconnect to " << clientAddr.toString() << endl;
     return 0;
@@ -165,17 +160,25 @@ int drawBoundingBox(cv::Mat& image, bbox_t& boundingBox)
     cv::rectangle(image, rect, color, 2);
 #endif
     if (min_rackx < (boundingBox.x + boundingBox.w / 2) && (boundingBox.x + boundingBox.w / 2) < max_rackx && min_racky < (boundingBox.y + boundingBox.h / 2) && (boundingBox.y + boundingBox.h / 2) < max_racky) {
+        float camera[3];
+        float pixel[2] = {boundingBox.x+boundingBox.w/2, boundingBox.y+boundingBox.h/2};
+        rs2_deproject_pixel_to_point(camera, &align_intrinsics, pixel, rack_depth);
         boundingBox.z_3d = rack_depth - 4.1;
-        boundingBox.x_3d = ((boundingBox.x + boundingBox.w / 2 - intrin.cx) / intrin.fx) * rack_depth - 32.5;
-        boundingBox.y_3d = ((boundingBox.y + boundingBox.h / 2 - intrin.cy) / intrin.fy) * rack_depth;
+        boundingBox.x_3d = camera[0]*1000-32.5;
+        boundingBox.y_3d = camera[1]*1000;
         return 2;
     }
-    float depth = depth_from_camera.at<float>(boundingBox.y + boundingBox.h / 2, boundingBox.x + boundingBox.w / 2);
+    float depth = 0;
+    yolov4->Get_Depth(boundingBox.x+boundingBox.w/2,boundingBox.y+boundingBox.h/2,depth);
     if (depth > 0) {
-        boundingBox.z_3d = depth - 4.1;
-        boundingBox.x_3d = ((boundingBox.x + boundingBox.w / 2 - intrin.cx) / intrin.fx) * depth - 32.5;
-        boundingBox.y_3d = ((boundingBox.y + boundingBox.h / 2 - intrin.cy) / intrin.fy) * depth;
-    } else {
+        float camera[3];
+        float pixel[2] = {boundingBox.x+boundingBox.w/2, boundingBox.y+boundingBox.h/2};
+        rs2_deproject_pixel_to_point(camera, &align_intrinsics, pixel, depth);
+        boundingBox.x_3d = camera[0]*1000-32.5;
+        boundingBox.y_3d = camera[1]*1000;
+        boundingBox.z_3d = depth*1000-4.1;
+    } 
+    else {
         boundingBox.z_3d = 0;
         boundingBox.x_3d = 0;
         boundingBox.y_3d = 0;

@@ -12,20 +12,12 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
-  image_transport 
-  cv_bridge 
+  message_generation
+  genmsg
   nodelet
 )
-#
-#set(POCO_INCLUDE_DIR "/usr/local/include")
-#set(POCO_LIBS 
-#  "/usr/local/lib/libPocoNet.so"
-#  "/usr/local/lib/libPocoNet.so.81"
-#  "/usr/local/lib/libPocoFoundation.so"
-#  "/usr/local/lib/libPocoFoundation.so.81")
-
 find_package(Poco COMPONENTS Net)
-
+find_package(realsense2 REQUIRED)
 include_directories(${catkin_INCLUDE_DIRS})
 
 set(OpenCV_STATIC OFF CACHE BOOL "Using OpenCV static linking library")
@@ -172,7 +164,7 @@ include_directories(src)
 
 add_executable(yolo_server src/yolo_server.cpp src/main.cpp)
 
-target_link_libraries(yolo_server ${DARKNET_LIBRARIES} ${OpenCV_LIBS} ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${Poco_LIBRARIES})
+target_link_libraries(yolo_server ${DARKNET_LIBRARIES} ${OpenCV_LIBS} ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${realsense2_LIBRARY} ${Poco_LIBRARIES})
 # add_dependencies(yolo_server ${process_EXPORTED_TARGETS} )
 #add_dependencies(yolo_server ${${PROJECT_NAME}_EXPORTED_TARGETS})
 

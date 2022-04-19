@@ -1,8 +1,6 @@
 #include "yolo_server.h"
-
-using namespace std;
 using namespace cv;
-
+using namespace std;
 Yolo *Yolo::inst = nullptr;
 Yolo *Yolo::GetYolo()
 {
@@ -11,97 +9,44 @@ Yolo *Yolo::GetYolo()
     return inst;
 }
 Yolo::Yolo() 
-: it_(ni_),
-  image_sub_flag(false),
-  depth_sub_flag(false),
-  calib_sub_flag(false)
 {
-    detector = new Detector("/home/vision1/model/yolo_v4/yolov4-tiny.cfg", "/home/vision1/model/yolo_v4/yolov4-tiny.weights");
-    InitialRos();
+    cfg.enable_stream(RS2_STREAM_COLOR, w, h, RS2_FORMAT_BGR8, 30);
+    cfg.enable_stream(RS2_STREAM_DEPTH, w, h, RS2_FORMAT_Z16, 30);
+    p_profile = pipe.start(cfg); 
+    detector = new Detector("/home/vision1/model/yolo_v4/yolov4-tiny.cfg", "/home/vision1/model/yolo_v4/yolov4-tiny.weights"); 
 }
 
 Yolo::~Yolo()
 {
-    //inst = nullptr;
-    if(inst)
-	delete(inst);
-    
-    if(detector)
-	delete(detector);
-    ros_thread->join();
-    delete ros_thread;
+    inst = nullptr;
 }
 
-void Yolo::InitialRos()
-{   
-    this->image_sub = this->it_.subscribe("/camera/color/image_raw", 1, &Yolo::IntelD435i_ImageCb, this);
-    this->depth_sub = this->it_.subscribe("/camera/depth/image_rect_raw", 1, &Yolo::IntelD435i_DepthCb, this);
-    this->calib_sub = this->n_.subscribe("/camera/color/camera_info", 1, &Yolo::IntelD435i_CalibCb, this);
-    ros_thread = new std::thread(&Yolo::Ros_spin,this);
-}
-
-void Yolo::Ros_spin()
-{   
-    while(true)
-    {   
-        ros::spinOnce();
-        std::this_thread::sleep_for(std::chrono::milliseconds(int(100)));
-    }
-}
-
-void Yolo::IntelD435i_ImageCb(const sensor_msgs::ImageConstPtr &msg)
+void Yolo::Realsense_stream_update(void)
 {
-    cv_bridge::CvImagePtr cv_ptr;
-    try
-    {
-        cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-        cv_ptr->image.copyTo(this->img_from_camera);
-        if(this->img_from_camera.rows > 0) image_sub_flag = true;
-        else image_sub_flag = false;
-        // cout << "image_sub_flag: " << image_sub_flag << endl;
-    }
-    catch (cv_bridge::Exception &e)
-    {
-        ROS_ERROR("cv_bridge exception: %s", e.what());
-        return;
-    }
-}
-
-void Yolo::IntelD435i_DepthCb(const sensor_msgs::ImageConstPtr &msg)
-{
-    cv_bridge::CvImagePtr cv_ptr;
-    try
-    {
-        cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::TYPE_32FC1);
-        this->depth_from_camera = cv_ptr->image.clone();
-        if(this->img_from_camera.rows > 0) depth_sub_flag = true;
-        else depth_sub_flag = false;
-        // cout << "depth_sub_flag: " << depth_sub_flag << endl;
-    }
-    catch (cv_bridge::Exception &e)
-    {
-        ROS_ERROR("cv_bridge exception: %s", e.what());
-        return;
-    }
-}
-
-void Yolo::IntelD435i_CalibCb(const sensor_msgs::CameraInfo &msg)
-{
-    try
-    {
-        this->intrin.fx = msg.K[0];
-        this->intrin.fy = msg.K[4];
-        this->intrin.cx = msg.K[2];
-        this->intrin.cy = msg.K[5];
-        if(intrin.fx>0 && intrin.fy>0 && intrin.cx>0 && intrin.cy>0) calib_sub_flag = true;
-        else calib_sub_flag = false;
-        // cout << "calib_sub_flag: " << calib_sub_flag << endl;
-    }
-    catch (const std::exception &e)
-    {
-        ROS_ERROR("Cameral Calibration Parameter exception: %s", e.what());
-        return;
-    }
+    rs2::frameset frames;
+    rs2::align align_to_color(RS2_STREAM_COLOR);
+    align_intrinsics = p_profile.get_stream(RS2_STREAM_COLOR).as<rs2::video_stream_profile>().get_intrinsics();
+    rs2::spatial_filter spat;
+    spat.set_option(RS2_OPTION_HOLES_FILL, 3);
+    // rs2::temporal_filter temp;
+    rs2::hole_filling_filter hole_filling_filter;
+    rs2::colorizer color_map;
+    color_map.set_option(RS2_OPTION_COLOR_SCHEME, 3.f);
+    frames = pipe.wait_for_frames();
+    // Align and get the frame
+    frames = spat.process(frames);
+    // frames = temp.process(frames);
+    frames = hole_filling_filter.process(frames);
+    // auto aligned_frames = align_to_color.process(frames);
+    // color_frame_ = aligned_frames.get_color_frame();
+    // depth_frame_ = aligned_frames.get_depth_frame();
+    color_frame_ = frames.get_color_frame();
+    depth_frame_ = frames.get_depth_frame();
+    // Transform the realsense data to cv mat   
+    cv::Mat(cv::Size(w, h), CV_8UC3, (void *)color_frame_.get_data(), cv::Mat::AUTO_STEP).copyTo(img_from_camera);
+    cv::Mat(cv::Size(w, h), CV_8UC1, (void *)depth_frame_.get_data(), cv::Mat::AUTO_STEP).copyTo(depth_from_camera);
+    rs2::frame color_aligned_depth_frame = color_map.colorize(depth_frame_);
+    cv::Mat(cv::Size(w, h), CV_8UC3, (void *)color_aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP).copyTo(depth_rgb_from_camera);
 }
 
 cv::Mat Yolo::Get_RGBimage(void)
@@ -109,17 +54,17 @@ cv::Mat Yolo::Get_RGBimage(void)
     return this->img_from_camera;
 }
 
-cv::Mat Yolo::Get_Depthimage(void)
+cv::Mat Yolo::Get_Depthrgbimage(void)
 {
-    return this->depth_from_camera;
+    return this->depth_rgb_from_camera;
 }
 
-void Yolo::Get_CameraIntrin(Intrinsic_Matrix& intrin)
+void Yolo::Get_Depth(float x, float y, float& depth)
 {
-    intrin = this->intrin;
+    depth = depth_frame_.as<rs2::depth_frame>().get_distance(x, y);
 }
 
-bool Yolo::GetAllDataSubstate(void)
+void Yolo::Get_CameraIntrin(rs2_intrinsics& align_intrinsics)
 {
-    return this->image_sub_flag * this->depth_sub_flag * this->calib_sub_flag;
+    align_intrinsics = this->align_intrinsics;
 }
