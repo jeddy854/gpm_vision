@@ -1,8 +1,0 @@
-#goal definition
-string policy
----
-#result definition
-string result
----
-#feedback
-string state
