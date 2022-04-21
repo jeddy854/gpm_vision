@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <cmath>
 #define DRAWING
 
 using std::cin;                      
@@ -169,28 +170,40 @@ int drawBoundingBox(cv::Mat& image, bbox_t& boundingBox)
         boundingBox.z_3d = rack_depth - 4.1;
         boundingBox.x_3d = camera[0]*1000-32.5;
         boundingBox.y_3d = camera[1]*1000;
+        #ifdef DRAWING
+        cv::putText(image, "( " + to_string(boundingBox.x_3d) + " " + to_string(boundingBox.y_3d) + " " + to_string(boundingBox.z_3d) + " )", rect.tl() + cv::Point(0, 20), 0, 0.7, color, 2);
+        #endif
         return 2;
     }
-    float depth = 0;
-    yolov4->Get_Depth(boundingBox.x+boundingBox.w/2,boundingBox.y+boundingBox.h/2,depth);
-    if (depth > 0) {
-        float camera[3];
-        float pixel[2] = {boundingBox.x+boundingBox.w/2, boundingBox.y+boundingBox.h/2};
-        rs2_deproject_pixel_to_point(camera, &align_intrinsics, pixel, depth);
-        boundingBox.x_3d = camera[0]*1000-32.5;
-        boundingBox.y_3d = camera[1]*1000;
-        boundingBox.z_3d = depth*1000-4.1;
-    } 
-    else {
+    if (min_tablex < (boundingBox.x + boundingBox.w / 2) && (boundingBox.x + boundingBox.w / 2) < max_tablex && min_tabley < (boundingBox.y + boundingBox.h/2) && (boundingBox.y + boundingBox.h/2) < max_tabley)
+    {
+        float a,b,a1,b1;
+        a = (70.0-155.0)/(410.0-305.0);
+        b = 70.0 - a * 410.0;
+        a1 = (530.0-620.0)/(305.0-410.0);
+        b1 = 530.0 - a1 * 305.0;
+        float x_left = (boundingBox.y + boundingBox.h)*a + b;
+        float x_right = (boundingBox.y + boundingBox.h)*a1 + b1;
+        float x_top = 155 + (530 - 155)*abs((x_right - boundingBox.x - boundingBox.w / 2))/abs((x_right - x_left));
+        float x_bottom = 70 + (620 - 70)*abs((x_right - boundingBox.x - boundingBox.w / 2))/abs((x_right - x_left));
+        cout << "x_pixel: " << (boundingBox.x + boundingBox.w / 2) << "ratiol: "<< (x_right - boundingBox.x - boundingBox.w / 2)/(x_right - x_left) <<endl;
+        cout << "x_left: " << x_left << "x_right: " << x_right << "x_top: " << x_top << "x_bottom: " << x_bottom <<endl;
+        boundingBox.x_3d = 400 + (-800)*(sqrt(pow((boundingBox.x + boundingBox.w / 2 - x_top),2)+pow((boundingBox.y + boundingBox.h - 305),2)))/(sqrt(pow((x_top - x_bottom),2)+pow((410 - 305),2)));
+        boundingBox.y_3d = 750 + (-1500)*(x_right - boundingBox.x - boundingBox.w / 2)/(x_right - x_left);
+        boundingBox.z_3d = 0;
+        #ifdef DRAWING
+        cv::putText(image, "( " + to_string(boundingBox.x_3d) + " " + to_string(boundingBox.y_3d) + " " + to_string(boundingBox.z_3d) + " )", rect.tl() + cv::Point(0, 20), 0, 0.7, color, 2);
+        #endif
+        return 1;
+    }
+    else
+    {
         boundingBox.z_3d = 0;
         boundingBox.x_3d = 0;
         boundingBox.y_3d = 0;
-    }
-#ifdef DRAWING
-    cv::putText(image, "( " + to_string(boundingBox.x_3d) + " " + to_string(boundingBox.y_3d) + " " + to_string(boundingBox.z_3d) + " )", rect.tl() + cv::Point(0, 20), 0, 0.7, color, 2);
-#endif
-    if (min_tablex < (boundingBox.x + boundingBox.w / 2) && (boundingBox.x + boundingBox.w / 2) < max_tablex && min_tabley < (boundingBox.y + boundingBox.h / 2) && (boundingBox.y + boundingBox.h / 2) < max_tabley)
-        return 1;
-    else
+        #ifdef DRAWING
+        cv::putText(image, "( " + to_string(boundingBox.x_3d) + " " + to_string(boundingBox.y_3d) + " " + to_string(boundingBox.z_3d) + " )", rect.tl() + cv::Point(0, 20), 0, 0.7, color, 2);
+        #endif
         return 0;
+    }
 }
