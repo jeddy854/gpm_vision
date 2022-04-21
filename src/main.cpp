@@ -25,15 +25,17 @@ using Poco::Net::SocketInputStream;
 using Poco::Net::SocketOutputStream; 
 using Poco::Net::StreamSocket;
 
-int max_tablex;
-int min_tablex;
-int max_tabley;
-int min_tabley;
-int max_rackx;
-int min_rackx;
-int max_racky;
-int min_racky;
-int rack_depth;
+float table_bottomr_x;
+float table_bottoml_x;
+float table_topr_x;
+float table_topl_x;
+float max_tabley;
+float min_tabley;
+float max_rackx;
+float min_rackx;
+float max_racky;
+float min_racky;
+float rack_depth;
 cv::Mat img_from_camera;
 rs2_intrinsics align_intrinsics;
 Yolo *yolov4;
@@ -73,23 +75,25 @@ int main(int argc, char* argv[])
         cerr << "Could not open the file - '" << filename << "'" << endl;
         return EXIT_FAILURE;
     }
-    vector<int> tmp;
+    vector<float> tmp;
     while (!input_file.eof()) 
     {
-        int number;
+        float number;
         input_file >> number;
         tmp.push_back(number);
     }
     input_file.close();
-    max_tablex = tmp[0];
-    min_tablex = tmp[1];
-    max_tabley = tmp[2];
-    min_tabley = tmp[3];
-    max_rackx = tmp[4];
-    min_rackx = tmp[5];
-    max_racky = tmp[6];
-    min_racky = tmp[7];
-    rack_depth = tmp[8];
+    table_bottomr_x = tmp[0];
+    table_bottoml_x = tmp[1];
+    table_topr_x = tmp[2];
+    table_topl_x = tmp[3];
+    max_tabley = tmp[4];
+    min_tabley = tmp[5];
+    max_rackx = tmp[6];
+    min_rackx = tmp[7];
+    max_racky = tmp[8];
+    min_racky = tmp[9];
+    rack_depth = tmp[10];
     std::vector<bbox_t> predict_result;
     Poco::Net::SocketAddress addr("0.0.0.0", 3000);
     Poco::Net::ServerSocket serverSocket(addr);
@@ -140,10 +144,10 @@ int main(int argc, char* argv[])
             cout << "New Connection from " << clientAddr.toString() << endl;
         }
         #ifdef DRAWING
-        cv::line(img_from_camera, cv::Point(620, 410), cv::Point(70, 410), cv::Scalar(0, 0, 255), 5, CV_AA);
-        cv::line(img_from_camera, cv::Point(70, 410), cv::Point(155, 305), cv::Scalar(0, 0, 255), 5, CV_AA);
-        cv::line(img_from_camera, cv::Point(155, 305), cv::Point(530, 305), cv::Scalar(0, 0, 255), 5, CV_AA);
-        cv::line(img_from_camera, cv::Point(530, 305), cv::Point(620, 410), cv::Scalar(0, 0, 255), 5, CV_AA);
+        cv::line(img_from_camera, cv::Point(table_bottomr_x, max_tabley), cv::Point(table_bottoml_x, max_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
+        cv::line(img_from_camera, cv::Point(table_bottoml_x, max_tabley), cv::Point(table_topl_x, min_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
+        cv::line(img_from_camera, cv::Point(table_topl_x, min_tabley), cv::Point(table_topr_x, min_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
+        cv::line(img_from_camera, cv::Point(table_topr_x, min_tabley), cv::Point(table_bottomr_x, max_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
         cv::imshow("Color Image", img_from_camera);
         cv::waitKey(100);
         #endif
@@ -175,20 +179,20 @@ int drawBoundingBox(cv::Mat& image, bbox_t& boundingBox)
         #endif
         return 2;
     }
-    if (min_tablex < (boundingBox.x + boundingBox.w / 2) && (boundingBox.x + boundingBox.w / 2) < max_tablex && min_tabley < (boundingBox.y + boundingBox.h/2) && (boundingBox.y + boundingBox.h/2) < max_tabley)
+    if (table_bottoml_x < (boundingBox.x + boundingBox.w / 2) && (boundingBox.x + boundingBox.w / 2) < table_bottomr_x && min_tabley < (boundingBox.y + boundingBox.h/2) && (boundingBox.y + boundingBox.h/2) < max_tabley)
     {
         float a,b,a1,b1;
-        a = (70.0-155.0)/(410.0-305.0);
-        b = 70.0 - a * 410.0;
-        a1 = (530.0-620.0)/(305.0-410.0);
-        b1 = 530.0 - a1 * 305.0;
+        a = (table_bottoml_x-table_topl_x)/(max_tabley-min_tabley);
+        b = table_bottoml_x - a * max_tabley;
+        a1 = (table_topr_x-table_bottomr_x)/(min_tabley-max_tabley);
+        b1 = table_topr_x - a1 * min_tabley;
         float x_left = (boundingBox.y + boundingBox.h)*a + b;
         float x_right = (boundingBox.y + boundingBox.h)*a1 + b1;
-        float x_top = 155 + (530 - 155)*abs((x_right - boundingBox.x - boundingBox.w / 2))/abs((x_right - x_left));
-        float x_bottom = 70 + (620 - 70)*abs((x_right - boundingBox.x - boundingBox.w / 2))/abs((x_right - x_left));
+        float x_top = table_topl_x + (table_topr_x - table_topl_x)*abs((x_right - boundingBox.x - boundingBox.w / 2))/abs((x_right - x_left));
+        float x_bottom = table_bottoml_x + (table_bottomr_x - table_bottoml_x)*abs((x_right - boundingBox.x - boundingBox.w / 2))/abs((x_right - x_left));
         cout << "x_pixel: " << (boundingBox.x + boundingBox.w / 2) << "ratiol: "<< (x_right - boundingBox.x - boundingBox.w / 2)/(x_right - x_left) <<endl;
         cout << "x_left: " << x_left << "x_right: " << x_right << "x_top: " << x_top << "x_bottom: " << x_bottom <<endl;
-        boundingBox.x_3d = 400 + (-800)*(sqrt(pow((boundingBox.x + boundingBox.w / 2 - x_top),2)+pow((boundingBox.y + boundingBox.h - 305),2)))/(sqrt(pow((x_top - x_bottom),2)+pow((410 - 305),2)));
+        boundingBox.x_3d = 400 + (-800)*(sqrt(pow((boundingBox.x + boundingBox.w / 2 - x_top),2)+pow((boundingBox.y + boundingBox.h - min_tabley),2)))/(sqrt(pow((x_top - x_bottom),2)+pow((max_tabley - min_tabley),2)));
         boundingBox.y_3d = 750 + (-1500)*(x_right - boundingBox.x - boundingBox.w / 2)/(x_right - x_left);
         boundingBox.z_3d = 0;
         #ifdef DRAWING
@@ -201,9 +205,6 @@ int drawBoundingBox(cv::Mat& image, bbox_t& boundingBox)
         boundingBox.z_3d = 0;
         boundingBox.x_3d = 0;
         boundingBox.y_3d = 0;
-        #ifdef DRAWING
-        cv::putText(image, "( " + to_string(boundingBox.x_3d) + " " + to_string(boundingBox.y_3d) + " " + to_string(boundingBox.z_3d) + " )", rect.tl() + cv::Point(0, 20), 0, 0.7, color, 2);
-        #endif
         return 0;
     }
 }
