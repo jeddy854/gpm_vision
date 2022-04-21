@@ -140,10 +140,10 @@ int main(int argc, char* argv[])
             cout << "New Connection from " << clientAddr.toString() << endl;
         }
         #ifdef DRAWING
-        cv::line(img_from_camera, cv::Point(min_tablex, max_tabley), cv::Point(max_tablex, max_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
-        cv::line(img_from_camera, cv::Point(max_tablex, max_tabley), cv::Point(max_tablex, min_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
-        cv::line(img_from_camera, cv::Point(max_tablex, min_tabley), cv::Point(min_tablex, min_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
-        cv::line(img_from_camera, cv::Point(min_tablex, min_tabley), cv::Point(min_tablex, max_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
+        cv::line(img_from_camera, cv::Point(620, 410), cv::Point(70, 410), cv::Scalar(0, 0, 255), 5, CV_AA);
+        cv::line(img_from_camera, cv::Point(70, 410), cv::Point(155, 305), cv::Scalar(0, 0, 255), 5, CV_AA);
+        cv::line(img_from_camera, cv::Point(155, 305), cv::Point(530, 305), cv::Scalar(0, 0, 255), 5, CV_AA);
+        cv::line(img_from_camera, cv::Point(530, 305), cv::Point(620, 410), cv::Scalar(0, 0, 255), 5, CV_AA);
         cv::imshow("Color Image", img_from_camera);
         cv::waitKey(100);
         #endif
