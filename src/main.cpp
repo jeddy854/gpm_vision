@@ -31,8 +31,10 @@ float table_topr_x;
 float table_topl_x;
 float max_tabley;
 float min_tabley;
-float max_rackx;
-float min_rackx;
+float rack_bottomr_x;
+float rack_bottoml_x;
+float rack_topr_x;
+float rack_topl_x;
 float max_racky;
 float min_racky;
 float rack_depth;
@@ -64,11 +66,11 @@ int main(int argc, char* argv[])
     cout << "Get Yolo." << endl;
 
     // vector<string> names = getClassName("/home/gpm-server/api/darknet/data/coco.names");
-    vector<string> names = getClassName("/home/vision1/api/darknet/data/coco.names");
-    // vector<string> names = getClassName("/home/vision2/api/darknet/data/coco.names");
-    // string filename("/home/gpm-server/server_vision/src/vision1.txt");
-    string filename("/home/vision1/May_ws/src/vision.txt");
-    // string filename("/home/vision2/May_ws/src/vision.txt");
+    // vector<string> names = getClassName("/home/vision1/api/darknet/data/coco.names");
+    vector<string> names = getClassName("/home/vision2/api/darknet/data/coco.names");
+    // string filename("/home/gpm-server/server_vision/src/vision2.txt");
+    // string filename("/home/vision1/May_ws/src/vision.txt");
+    string filename("/home/vision2/May_ws/src/vision.txt");
     std::ifstream input_file(filename, std::ios::in);
     if (!input_file.is_open()) 
     {
@@ -89,11 +91,13 @@ int main(int argc, char* argv[])
     table_topl_x = tmp[3];
     max_tabley = tmp[4];
     min_tabley = tmp[5];
-    max_rackx = tmp[6];
-    min_rackx = tmp[7];
-    max_racky = tmp[8];
-    min_racky = tmp[9];
-    rack_depth = tmp[10];
+    rack_bottomr_x = tmp[6];
+    rack_bottoml_x = tmp[7];
+    rack_topr_x = tmp[8];
+    rack_topl_x = tmp[9];
+    max_racky = tmp[10];
+    min_racky = tmp[11];
+    rack_depth = tmp[12];
     std::vector<bbox_t> predict_result;
     Poco::Net::SocketAddress addr("0.0.0.0", 3000);
     Poco::Net::ServerSocket serverSocket(addr);
@@ -148,6 +152,11 @@ int main(int argc, char* argv[])
         cv::line(img_from_camera, cv::Point(table_bottoml_x, max_tabley), cv::Point(table_topl_x, min_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
         cv::line(img_from_camera, cv::Point(table_topl_x, min_tabley), cv::Point(table_topr_x, min_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
         cv::line(img_from_camera, cv::Point(table_topr_x, min_tabley), cv::Point(table_bottomr_x, max_tabley), cv::Scalar(0, 0, 255), 5, CV_AA);
+        
+        cv::line(img_from_camera, cv::Point(rack_bottomr_x, max_racky), cv::Point(rack_bottoml_x, max_racky), cv::Scalar(0, 0, 255), 5, CV_AA);
+        cv::line(img_from_camera, cv::Point(rack_bottoml_x, max_racky), cv::Point(rack_topl_x, min_racky), cv::Scalar(0, 0, 255), 5, CV_AA);
+        cv::line(img_from_camera, cv::Point(rack_topl_x, min_racky), cv::Point(rack_topr_x, min_racky), cv::Scalar(0, 0, 255), 5, CV_AA);
+        cv::line(img_from_camera, cv::Point(rack_topr_x, min_racky), cv::Point(rack_bottomr_x, max_racky), cv::Scalar(0, 0, 255), 5, CV_AA);
         cv::imshow("Color Image", img_from_camera);
         cv::waitKey(100);
         #endif
@@ -167,13 +176,21 @@ int drawBoundingBox(cv::Mat& image, bbox_t& boundingBox)
     cv::Scalar color(b, g, r);
     cv::rectangle(image, rect, color, 2);
 #endif
-    if (min_rackx < (boundingBox.x + boundingBox.w / 2) && (boundingBox.x + boundingBox.w / 2) < max_rackx && min_racky < (boundingBox.y + boundingBox.h / 2) && (boundingBox.y + boundingBox.h / 2) < max_racky) {
-        float camera[3];
-        float pixel[2] = {boundingBox.x+boundingBox.w/2, boundingBox.y+boundingBox.h/2};
-        rs2_deproject_pixel_to_point(camera, &align_intrinsics, pixel, rack_depth);
-        boundingBox.z_3d = rack_depth - 4.1;
-        boundingBox.x_3d = camera[0]*1000-32.5;
-        boundingBox.y_3d = camera[1]*1000;
+    if (rack_bottoml_x < (boundingBox.x + boundingBox.w / 2) && (boundingBox.x + boundingBox.w / 2) < rack_bottomr_x && min_racky < (boundingBox.y + boundingBox.h / 2) && (boundingBox.y + boundingBox.h / 2) < max_racky) {
+        float a,b,a1,b1;
+        a = (rack_bottoml_x-rack_topl_x)/(max_racky-min_racky);
+        b = rack_bottoml_x - a * max_racky;
+        a1 = (rack_topr_x-rack_bottomr_x)/(min_racky-max_racky);
+        b1 = rack_topr_x - a1 * min_racky;
+        float x_left = (boundingBox.y + boundingBox.h)*a + b;
+        float x_right = (boundingBox.y + boundingBox.h)*a1 + b1;
+        float x_top = rack_topl_x + (rack_topr_x - rack_topl_x)*abs((x_right - boundingBox.x - boundingBox.w / 2))/abs((x_right - x_left));
+        float x_bottom = rack_bottoml_x + (rack_bottomr_x - rack_bottoml_x)*abs((x_right - boundingBox.x - boundingBox.w / 2))/abs((x_right - x_left));
+        // cout << "x_pixel: " << (boundingBox.x + boundingBox.w / 2) << "ratiol: "<< (x_right - boundingBox.x - boundingBox.w / 2)/(x_right - x_left) <<endl;
+        // cout << "x_left: " << x_left << "x_right: " << x_right << "x_top: " << x_top << "x_bottom: " << x_bottom <<endl;
+        boundingBox.x_3d = 1880 + 445 + (-445)*(sqrt(pow((boundingBox.x + boundingBox.w / 2 - x_top),2)+pow((boundingBox.y + boundingBox.h - min_racky),2)))/(sqrt(pow((x_top - x_bottom),2)+pow((max_racky - min_racky),2)));
+        boundingBox.y_3d = 450 + (-900)*(x_right - boundingBox.x - boundingBox.w / 2)/(x_right - x_left);
+        boundingBox.z_3d = 0;
         #ifdef DRAWING
         cv::putText(image, "( " + to_string(boundingBox.x_3d) + " " + to_string(boundingBox.y_3d) + " " + to_string(boundingBox.z_3d) + " )", rect.tl() + cv::Point(0, 20), 0, 0.7, color, 2);
         #endif
@@ -188,12 +205,13 @@ int drawBoundingBox(cv::Mat& image, bbox_t& boundingBox)
         b1 = table_topr_x - a1 * min_tabley;
         float x_left = (boundingBox.y + boundingBox.h)*a + b;
         float x_right = (boundingBox.y + boundingBox.h)*a1 + b1;
-        float x_top = table_topl_x + (table_topr_x - table_topl_x)*abs((x_right - boundingBox.x - boundingBox.w / 2))/abs((x_right - x_left));
-        float x_bottom = table_bottoml_x + (table_bottomr_x - table_bottoml_x)*abs((x_right - boundingBox.x - boundingBox.w / 2))/abs((x_right - x_left));
-        cout << "x_pixel: " << (boundingBox.x + boundingBox.w / 2) << "ratiol: "<< (x_right - boundingBox.x - boundingBox.w / 2)/(x_right - x_left) <<endl;
+        float x_top = table_topl_x + (table_topr_x - table_topl_x)*abs((boundingBox.x + boundingBox.w / 2 - x_left))/abs((x_right - x_left));
+        float x_bottom = table_bottoml_x + (table_bottomr_x - table_bottoml_x)*abs((boundingBox.x + boundingBox.w / 2 - x_left))/abs((x_right - x_left));
+        cout << "x_pixel: " << (boundingBox.x + boundingBox.w / 2) << "ratiol: "<< (boundingBox.x + boundingBox.w / 2 - x_left)/(x_right - x_left) <<endl;
         cout << "x_left: " << x_left << "x_right: " << x_right << "x_top: " << x_top << "x_bottom: " << x_bottom <<endl;
+        cout << "x: " << (boundingBox.x + boundingBox.w / 2) << "y: " << (boundingBox.y + boundingBox.h) << " " << (boundingBox.y + boundingBox.h-305.0)/105.0 << endl;
         boundingBox.x_3d = 400 + (-800)*(sqrt(pow((boundingBox.x + boundingBox.w / 2 - x_top),2)+pow((boundingBox.y + boundingBox.h - min_tabley),2)))/(sqrt(pow((x_top - x_bottom),2)+pow((max_tabley - min_tabley),2)));
-        boundingBox.y_3d = 750 + (-1500)*(x_right - boundingBox.x - boundingBox.w / 2)/(x_right - x_left);
+        boundingBox.y_3d = 750 + (-1500)*(boundingBox.x + boundingBox.w / 2 - x_left)/(x_right - x_left);
         boundingBox.z_3d = 0;
         #ifdef DRAWING
         cv::putText(image, "( " + to_string(boundingBox.x_3d) + " " + to_string(boundingBox.y_3d) + " " + to_string(boundingBox.z_3d) + " )", rect.tl() + cv::Point(0, 20), 0, 0.7, color, 2);
