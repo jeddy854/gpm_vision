@@ -6,6 +6,8 @@
 #include <string>
 #include <sstream>
 #include <cmath>
+#include <system>
+
 #define DRAWING
 
 using std::cin;                      
@@ -122,6 +124,7 @@ int main(int argc, char* argv[])
             cout << "New Connection from " << clientAddr.toString() << endl;
         }
         yolov4->Realsense_stream_update();
+        system("clear");
         cout << "Get Ready." << endl;
         cout << "Accept Connection." << endl;
         img_from_camera = yolov4->Get_RGBimage();
