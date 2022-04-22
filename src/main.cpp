@@ -6,7 +6,7 @@
 #include <string>
 #include <sstream>
 #include <cmath>
-#include <system>
+#include <cstdlib>
 
 #define DRAWING
 
@@ -210,9 +210,9 @@ int drawBoundingBox(cv::Mat& image, bbox_t& boundingBox)
         float x_right = (boundingBox.y + boundingBox.h)*a1 + b1;
         float x_top = table_topl_x + (table_topr_x - table_topl_x)*abs((boundingBox.x + boundingBox.w / 2 - x_left))/abs((x_right - x_left));
         float x_bottom = table_bottoml_x + (table_bottomr_x - table_bottoml_x)*abs((boundingBox.x + boundingBox.w / 2 - x_left))/abs((x_right - x_left));
-        cout << "x_pixel: " << (boundingBox.x + boundingBox.w / 2) << "ratiol: "<< (boundingBox.x + boundingBox.w / 2 - x_left)/(x_right - x_left) <<endl;
-        cout << "x_left: " << x_left << "x_right: " << x_right << "x_top: " << x_top << "x_bottom: " << x_bottom <<endl;
-        cout << "x: " << (boundingBox.x + boundingBox.w / 2) << "y: " << (boundingBox.y + boundingBox.h) << " " << (boundingBox.y + boundingBox.h-305.0)/105.0 << endl;
+        // cout << "x_pixel: " << (boundingBox.x + boundingBox.w / 2) << "ratiol: "<< (boundingBox.x + boundingBox.w / 2 - x_left)/(x_right - x_left) <<endl;
+        // cout << "x_left: " << x_left << "x_right: " << x_right << "x_top: " << x_top << "x_bottom: " << x_bottom <<endl;
+        // cout << "x: " << (boundingBox.x + boundingBox.w / 2) << "y: " << (boundingBox.y + boundingBox.h) << " " << (boundingBox.y + boundingBox.h-305.0)/105.0 << endl;
         boundingBox.x_3d = 400 + (-800)*(sqrt(pow((boundingBox.x + boundingBox.w / 2 - x_top),2)+pow((boundingBox.y + boundingBox.h - min_tabley),2)))/(sqrt(pow((x_top - x_bottom),2)+pow((max_tabley - min_tabley),2)));
         boundingBox.y_3d = 750 + (-1500)*(boundingBox.x + boundingBox.w / 2 - x_left)/(x_right - x_left);
         boundingBox.z_3d = 0;
