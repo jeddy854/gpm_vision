@@ -15,7 +15,7 @@ Yolo::Yolo()
     p_profile = pipe.start(cfg); 
     // detector = new Detector("/home/gpm-server/model/yolo_v4/yolov4-tiny.cfg", "/home/gpm-server/model/yolo_v4/yolov4-tiny.weights");
     // detector = new Detector("/home/vision1/model/yolo_v4/yolov4.cfg", "/home/vision1/model/yolo_v4/yolov4.weights");
-    detector = new Detector("/home/vision2/model/yolo_v4/yolov4-tiny.cfg", "/home/vision2/model/yolo_v4/yolov4-tiny.weights");
+    detector = new Detector("/home/vision2/model/yolo_v4/yolov4.cfg", "/home/vision2/model/yolo_v4/yolov4.weights");
 }
 
 Yolo::~Yolo()
