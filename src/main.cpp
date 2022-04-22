@@ -191,7 +191,8 @@ int drawBoundingBox(cv::Mat& image, bbox_t& boundingBox)
         float x_bottom = rack_bottoml_x + (rack_bottomr_x - rack_bottoml_x)*abs((x_right - boundingBox.x - boundingBox.w / 2))/abs((x_right - x_left));
         // cout << "x_pixel: " << (boundingBox.x + boundingBox.w / 2) << "ratiol: "<< (x_right - boundingBox.x - boundingBox.w / 2)/(x_right - x_left) <<endl;
         // cout << "x_left: " << x_left << "x_right: " << x_right << "x_top: " << x_top << "x_bottom: " << x_bottom <<endl;
-        boundingBox.x_3d = 1880 + 445 + (-445)*(sqrt(pow((boundingBox.x + boundingBox.w / 2 - x_top),2)+pow((boundingBox.y + boundingBox.h - min_racky),2)))/(sqrt(pow((x_top - x_bottom),2)+pow((max_racky - min_racky),2)));
+        // boundingBox.x_3d = 1880 + 445 + (-445)*(sqrt(pow((boundingBox.x + boundingBox.w / 2 - x_top),2)+pow((boundingBox.y + boundingBox.h - min_racky),2)))/(sqrt(pow((x_top - x_bottom),2)+pow((max_racky - min_racky),2)));
+        boundingBox.x_3d = 1880 + 445 + (-445)*(boundingBox.y + boundingBox.h - min_racky)/(max_racky - min_racky);
         boundingBox.y_3d = 450 + (-900)*(x_right - boundingBox.x - boundingBox.w / 2)/(x_right - x_left);
         boundingBox.z_3d = 0;
         #ifdef DRAWING
@@ -213,7 +214,8 @@ int drawBoundingBox(cv::Mat& image, bbox_t& boundingBox)
         // cout << "x_pixel: " << (boundingBox.x + boundingBox.w / 2) << "ratiol: "<< (boundingBox.x + boundingBox.w / 2 - x_left)/(x_right - x_left) <<endl;
         // cout << "x_left: " << x_left << "x_right: " << x_right << "x_top: " << x_top << "x_bottom: " << x_bottom <<endl;
         // cout << "x: " << (boundingBox.x + boundingBox.w / 2) << "y: " << (boundingBox.y + boundingBox.h) << " " << (boundingBox.y + boundingBox.h-305.0)/105.0 << endl;
-        boundingBox.x_3d = 400 + (-800)*(sqrt(pow((boundingBox.x + boundingBox.w / 2 - x_top),2)+pow((boundingBox.y + boundingBox.h - min_tabley),2)))/(sqrt(pow((x_top - x_bottom),2)+pow((max_tabley - min_tabley),2)));
+        // boundingBox.x_3d = 400 + (-800)*(sqrt(pow((boundingBox.x + boundingBox.w / 2 - x_top),2)+pow((boundingBox.y + boundingBox.h - min_tabley),2)))/(sqrt(pow((x_top - x_bottom),2)+pow((max_tabley - min_tabley),2)));
+        boundingBox.x_3d = 400 + (-800)*(boundingBox.y + boundingBox.h - min_tabley)/(max_tabley - min_tabley);
         boundingBox.y_3d = 750 + (-1500)*(boundingBox.x + boundingBox.w / 2 - x_left)/(x_right - x_left);
         boundingBox.z_3d = 0;
         #ifdef DRAWING
