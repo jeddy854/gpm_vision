@@ -66,11 +66,11 @@ int main(int argc, char* argv[])
     cout << "Get Yolo." << endl;
 
     // vector<string> names = getClassName("/home/gpm-server/api/darknet/data/coco.names");
-    vector<string> names = getClassName("/home/vision1/api/darknet/data/coco.names");
-    // vector<string> names = getClassName("/home/vision2/api/darknet/data/coco.names");
+    // vector<string> names = getClassName("/home/vision1/api/darknet/data/coco.names");
+    vector<string> names = getClassName("/home/vision2/api/darknet/data/coco.names");
     // string filename("/home/gpm-server/server_vision/src/vision2.txt");
-    string filename("/home/vision1/May_ws/src/vision.txt");
-    // string filename("/home/vision2/May_ws/src/vision.txt");
+    // string filename("/home/vision1/May_ws/src/vision.txt");
+    string filename("/home/vision2/May_ws/src/vision.txt");
     std::ifstream input_file(filename, std::ios::in);
     if (!input_file.is_open()) 
     {
