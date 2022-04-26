@@ -39,7 +39,7 @@ float rack_topr_x;
 float rack_topl_x;
 float max_racky;
 float min_racky;
-float rack_depth;
+float table_half;
 cv::Mat img_from_camera;
 rs2_intrinsics align_intrinsics;
 Yolo *yolov4;
@@ -60,6 +60,9 @@ vector<string> getClassName(std::string fileName) {
     }
     return ret;
 }
+// vector<string> names = getClassName("/home/gpm-server/gpm/gpm_jssp/setting/gpm.names");
+vector<string> names = getClassName("/home/vision1/gpm/gpm_jssp/setting/gpm.names");
+// vector<string> names = getClassName("/home/vision2/gpm/gpm_jssp/setting/gpm.names");
 
 int main(int argc, char* argv[])
 {
@@ -67,12 +70,9 @@ int main(int argc, char* argv[])
     yolov4 = Yolo::GetYolo();
     cout << "Get Yolo." << endl;
 
-    // vector<string> names = getClassName("/home/gpm-server/api/darknet/data/coco.names");
-    // vector<string> names = getClassName("/home/vision1/api/darknet/data/coco.names");
-    vector<string> names = getClassName("/home/vision2/api/darknet/data/coco.names");
-    // string filename("/home/gpm-server/server_vision/src/vision2.txt");
-    // string filename("/home/vision1/May_ws/src/vision.txt");
-    string filename("/home/vision2/May_ws/src/vision.txt");
+    // string filename("/home/gpm-server/server_vision/src/vision1.txt");
+    string filename("/home/vision1/May_ws/src/vision.txt");
+    // string filename("/home/vision2/May_ws/src/vision.txt");
     std::ifstream input_file(filename, std::ios::in);
     if (!input_file.is_open()) 
     {
@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
     rack_topl_x = tmp[9];
     max_racky = tmp[10];
     min_racky = tmp[11];
-    rack_depth = tmp[12];
+    table_half = tmp[12];
     std::vector<bbox_t> predict_result;
     Poco::Net::SocketAddress addr("0.0.0.0", 3000);
     Poco::Net::ServerSocket serverSocket(addr);
@@ -130,14 +130,14 @@ int main(int argc, char* argv[])
         img_from_camera = yolov4->Get_RGBimage();
         cout << "rows: " <<  img_from_camera.rows <<" cols: " << img_from_camera.cols <<endl;
         yolov4->Get_CameraIntrin(align_intrinsics);
-        predict_result = yolov4->detector->detect(img_from_camera, 0.2);
+        predict_result = yolov4->detector->detect(img_from_camera, 0.75);
         cout << predict_result.size() << endl;
         for (auto p : predict_result) 
         {
             int location_label = drawBoundingBox(img_from_camera, p);
 
             tmpString << to_string(p.obj_id) + " " + to_string(p.x_3d) + " " + to_string(p.y_3d) + " " + to_string(p.z_3d) + " " + to_string(location_label) + " ";
-            cout << names[p.obj_id] << " " << p.x_3d << " " << p.y_3d << " " << p.z_3d <<" "<< p.obj_id <<" "<< location_label << endl;
+            cout << names[p.obj_id] <<  " " << p.x_3d << " " << p.y_3d << " " << location_label << endl;
             
         }
         if (predict_result.size() < 1)
@@ -196,11 +196,12 @@ int drawBoundingBox(cv::Mat& image, bbox_t& boundingBox)
         boundingBox.y_3d = 450 + (-900)*(x_right - boundingBox.x - boundingBox.w / 2)/(x_right - x_left);
         boundingBox.z_3d = 0;
         #ifdef DRAWING
-        cv::putText(image, "( " + to_string(boundingBox.x_3d) + " " + to_string(boundingBox.y_3d) + " " + to_string(boundingBox.z_3d) + " )", rect.tl() + cv::Point(0, 20), 0, 0.7, color, 2);
+        // cv::putText(image, "( " + to_string(boundingBox.x_3d) + " " + to_string(boundingBox.y_3d) + " " + to_string(boundingBox.z_3d) + " )", rect.tl() + cv::Point(0, 20), 0, 0.7, color, 2);
+        cv::putText(image, names[boundingBox.obj_id] + "Y: " + to_string(boundingBox.y_3d), rect.tl() + cv::Point(0, 20), 0, 0.7, color, 2);
         #endif
-        return 2;
+        return 3;
     }
-    if (table_bottoml_x < (boundingBox.x + boundingBox.w / 2) && (boundingBox.x + boundingBox.w / 2) < table_bottomr_x && min_tabley < (boundingBox.y + boundingBox.h/2) && (boundingBox.y + boundingBox.h/2) < max_tabley)
+    if (table_bottoml_x < (boundingBox.x + boundingBox.w / 2) && (boundingBox.x + boundingBox.w / 2) < table_bottomr_x && min_tabley < (boundingBox.y + 2*boundingBox.h/3) && (boundingBox.y + 2*boundingBox.h/3) < max_tabley)
     {
         float a,b,a1,b1;
         a = (table_bottoml_x-table_topl_x)/(max_tabley-min_tabley);
@@ -215,13 +216,20 @@ int drawBoundingBox(cv::Mat& image, bbox_t& boundingBox)
         // cout << "x_left: " << x_left << "x_right: " << x_right << "x_top: " << x_top << "x_bottom: " << x_bottom <<endl;
         // cout << "x: " << (boundingBox.x + boundingBox.w / 2) << "y: " << (boundingBox.y + boundingBox.h) << " " << (boundingBox.y + boundingBox.h-305.0)/105.0 << endl;
         // boundingBox.x_3d = 400 + (-800)*(sqrt(pow((boundingBox.x + boundingBox.w / 2 - x_top),2)+pow((boundingBox.y + boundingBox.h - min_tabley),2)))/(sqrt(pow((x_top - x_bottom),2)+pow((max_tabley - min_tabley),2)));
-        boundingBox.x_3d = 400 + (-800)*(boundingBox.y + boundingBox.h - min_tabley)/(max_tabley - min_tabley);
         boundingBox.y_3d = 750 + (-1500)*(boundingBox.x + boundingBox.w / 2 - x_left)/(x_right - x_left);
         boundingBox.z_3d = 0;
         #ifdef DRAWING
-        cv::putText(image, "( " + to_string(boundingBox.x_3d) + " " + to_string(boundingBox.y_3d) + " " + to_string(boundingBox.z_3d) + " )", rect.tl() + cv::Point(0, 20), 0, 0.7, color, 2);
+        // cv::putText(image, "( " + to_string(boundingBox.x_3d) + " " + to_string(boundingBox.y_3d) + " " + to_string(boundingBox.z_3d) + " )", rect.tl() + cv::Point(0, 20), 0, 0.7, color, 2);
+        cv::putText(image, names[boundingBox.obj_id] + "Y: " + to_string(boundingBox.y_3d), rect.tl() + cv::Point(0, 20), 0, 0.7, color, 2);
         #endif
-        return 1;
+        if(boundingBox.y + boundingBox.h <= table_half){ 
+            boundingBox.x_3d = 400 + (-400)*(min_tabley - boundingBox.y - boundingBox.h)/(min_tabley - table_half);
+            return 2;
+        }
+        else{
+            boundingBox.x_3d = 0 + (-400)*(table_half - boundingBox.y - boundingBox.h)/(table_half - max_tabley);
+            return 1;
+        }
     }
     else
     {

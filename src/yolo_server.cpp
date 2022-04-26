@@ -13,9 +13,9 @@ Yolo::Yolo()
     cfg.enable_stream(RS2_STREAM_COLOR, w, h, RS2_FORMAT_BGR8, 30);
     cfg.enable_stream(RS2_STREAM_DEPTH, w, h, RS2_FORMAT_Z16, 30);
     p_profile = pipe.start(cfg); 
-    // detector = new Detector("/home/gpm-server/model/yolo_v4/yolov4-tiny.cfg", "/home/gpm-server/model/yolo_v4/yolov4-tiny.weights");
-    // detector = new Detector("/home/vision1/model/yolo_v4/yolov4.cfg", "/home/vision1/model/yolo_v4/yolov4.weights");
-    detector = new Detector("/home/vision2/model/yolo_v4/yolov4.cfg", "/home/vision2/model/yolo_v4/yolov4.weights");
+    // detector = new Detector("/home/gpm-server/gpm/gpm_jssp/setting/yolov4-tiny.cfg", "/home/gpm-server/gpm/gpm_jssp/model/yolov4-tiny_last.weights");
+    detector = new Detector("/home/vision1/gpm/gpm_jssp/setting/yolov4-tiny.cfg", "/home/vision1//gpm/gpm_jssp/model/yolov4-tiny_last.weights");
+    // detector = new Detector("/home/vision2/gpm/gpm_jssp/setting/yolov4-tiny.cfg", "/home/vision2//gpm/gpm_jssp/model/yolov4-tiny_last.weights");
 }
 
 Yolo::~Yolo()
