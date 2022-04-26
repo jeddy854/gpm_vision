@@ -224,11 +224,13 @@ int drawBoundingBox(cv::Mat& image, bbox_t& boundingBox)
         #endif
         if(boundingBox.y + boundingBox.h <= table_half){ 
             boundingBox.x_3d = 400 + (-400)*(min_tabley - boundingBox.y - boundingBox.h)/(min_tabley - table_half);
-            return 2;
+            // return 2;//vision1
+            return 1;//vision2
         }
         else{
             boundingBox.x_3d = 0 + (-400)*(table_half - boundingBox.y - boundingBox.h)/(table_half - max_tabley);
-            return 1;
+            // return 1;//vision1
+            return 2;//vision2
         }
     }
     else
