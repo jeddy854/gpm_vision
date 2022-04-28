@@ -61,8 +61,8 @@ vector<string> getClassName(std::string fileName) {
     return ret;
 }
 // vector<string> names = getClassName("/home/gpm-server/gpm/gpm_jssp/setting/gpm.names");
-vector<string> names = getClassName("/home/vision1/gpm/gpm_jssp/setting/gpm.names");
-// vector<string> names = getClassName("/home/vision2/gpm/gpm_jssp/setting/gpm.names");
+// vector<string> names = getClassName("/home/vision1/gpm/gpm_jssp/setting/gpm.names");
+vector<string> names = getClassName("/home/vision2/gpm/gpm_jssp/setting/gpm.names");
 
 int main(int argc, char* argv[])
 {
@@ -71,8 +71,8 @@ int main(int argc, char* argv[])
     cout << "Get Yolo." << endl;
 
     // string filename("/home/gpm-server/server_vision/src/vision1.txt");
-    string filename("/home/vision1/May_ws/src/vision.txt");
-    // string filename("/home/vision2/May_ws/src/vision.txt");
+    // string filename("/home/vision1/May_ws/src/vision.txt");
+    string filename("/home/vision2/May_ws/src/vision.txt");
     std::ifstream input_file(filename, std::ios::in);
     if (!input_file.is_open()) 
     {
