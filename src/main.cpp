@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
         img_from_camera = yolov4->Get_RGBimage();
         cout << "rows: " <<  img_from_camera.rows <<" cols: " << img_from_camera.cols <<endl;
         yolov4->Get_CameraIntrin(align_intrinsics);
-        predict_result = yolov4->detector->detect(img_from_camera, 0.75);
+        predict_result = yolov4->detector->detect(img_from_camera, 0.7);
         cout << predict_result.size() << endl;
         for (auto p : predict_result) 
         {
