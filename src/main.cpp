@@ -197,7 +197,7 @@ int drawBoundingBox(cv::Mat& image, bbox_t& boundingBox)
         boundingBox.z_3d = 0;
         #ifdef DRAWING
         // cv::putText(image, "( " + to_string(boundingBox.x_3d) + " " + to_string(boundingBox.y_3d) + " " + to_string(boundingBox.z_3d) + " )", rect.tl() + cv::Point(0, 20), 0, 0.7, color, 2);
-        cv::putText(image, names[boundingBox.obj_id] + "Y: " + to_string(boundingBox.y_3d), rect.tl() + cv::Point(0, 20), 0, 0.7, color, 2);
+        cv::putText(image, names[boundingBox.obj_id] + "Y: " + to_string(boundingBox.y_3d), rect.tl() + cv::Point(0, -20), 0, 0.3, color, 2);
         #endif
         return 3;
     }
@@ -220,7 +220,7 @@ int drawBoundingBox(cv::Mat& image, bbox_t& boundingBox)
         boundingBox.z_3d = 0;
         #ifdef DRAWING
         // cv::putText(image, "( " + to_string(boundingBox.x_3d) + " " + to_string(boundingBox.y_3d) + " " + to_string(boundingBox.z_3d) + " )", rect.tl() + cv::Point(0, 20), 0, 0.7, color, 2);
-        cv::putText(image, names[boundingBox.obj_id] + "Y: " + to_string(boundingBox.y_3d), rect.tl() + cv::Point(0, 20), 0, 0.7, color, 2);
+        cv::putText(image, names[boundingBox.obj_id] + "Y: " + to_string(boundingBox.y_3d), rect.tl() + cv::Point(0, -20), 0, 0.3, color, 2);
         #endif
         if(boundingBox.y + boundingBox.h <= table_half){ 
             boundingBox.x_3d = 400 + (-400)*(min_tabley - boundingBox.y - boundingBox.h)/(min_tabley - table_half);
