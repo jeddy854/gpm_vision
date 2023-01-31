@@ -173,10 +173,11 @@ int main(int argc, char* argv[])
         for (auto p : predict_result) 
         {
             int location_label = drawBoundingBox(img_from_camera, p, std::stoi(argv[1]));
-
-            tmpString << to_string(p.obj_id) + " " + to_string(p.x_3d) + " " + to_string(p.y_3d) + " " + to_string(p.z_3d) + " " + to_string(location_label) + " ";
-            cout << names[p.obj_id] <<  " " << p.x_3d << " " << p.y_3d << " " << location_label << endl;
-            
+            if (p.z_3d != 0.f)
+            {
+                tmpString << to_string(p.obj_id) + " " + to_string(p.x_3d) + " " + to_string(p.y_3d) + " " + to_string(p.z_3d) + " " + to_string(location_label) + " ";
+                cout << names[p.obj_id] <<  " " << p.x_3d << " " << p.y_3d << " " << location_label << endl;
+            }
         }
         if (predict_result.size() < 1)
         {
