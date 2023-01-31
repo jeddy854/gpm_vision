@@ -181,8 +181,13 @@ int main(int argc, char* argv[])
         if (predict_result.size() < 1)
         {
             sout << "None" << endl;
+            cout << "string: " << "None" << endl;
         }
-        else sout << tmpString.str() << endl;
+        else 
+        {
+            sout << tmpString.str() << endl;
+            cout << "string: " << tmpString.str() << endl;
+        }
         if (!sout) 
         {
             client = serverSocket.acceptConnection(clientAddr);
