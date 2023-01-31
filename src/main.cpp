@@ -176,7 +176,7 @@ int main(int argc, char* argv[])
             if (p.x_3d != 0.f)
             {
                 tmpString << to_string(p.obj_id) + " " + to_string(p.x_3d) + " " + to_string(p.y_3d) + " " + to_string(p.z_3d) + " " + to_string(location_label) + " ";
-                cout << names[p.obj_id] <<  " " << p.x_3d << " " << p.y_3d << " " << location_label << endl;
+                cout << names[p.obj_id] <<  " " << p.x_3d << " " << p.y_3d << " " << location_label << " " << p. << endl;
             }
         }
         if (predict_result.size() < 1)
@@ -267,7 +267,7 @@ int drawBoundingBox(cv::Mat& image, bbox_t& boundingBox, const int& location)
         cv::putText(image, names[boundingBox.obj_id] + "Y: " + to_string(boundingBox.y_3d), rect.tl() + cv::Point(0, -5), 0, 0.3, color, 2);
         #endif
         if(boundingBox.y + boundingBox.h <= table_half){ 
-            boundingBox.x_3d = 400 + (-400)*(min_tabley - boundingBox.y - boundingBox.h)/(min_tabley - table_half);
+            boundingBox.x_3d = 400 + (-400)*(min_tabley - boundingBox.y - boundingBox.h/2)/(min_tabley - table_half);
             switch (location)
             {
                 case 1:
@@ -277,7 +277,7 @@ int drawBoundingBox(cv::Mat& image, bbox_t& boundingBox, const int& location)
             }
         }
         else{
-            boundingBox.x_3d = 0 + (-400)*(table_half - boundingBox.y - boundingBox.h)/(table_half - max_tabley);
+            boundingBox.x_3d = 0 + (-400)*(table_half - boundingBox.y - boundingBox.h/2)/(table_half - max_tabley);
             switch (location)
             {
                 case 1:
