@@ -2,20 +2,35 @@
 using namespace cv;
 using namespace std;
 Yolo *Yolo::inst = nullptr;
-Yolo *Yolo::GetYolo()
+Yolo *Yolo::GetYolo(const int &location)
 {
     if (inst == nullptr)
-        inst = new Yolo();
+        inst = new Yolo(location);
     return inst;
 }
-Yolo::Yolo() 
+Yolo::Yolo(const int &location) 
 {
     cfg.enable_stream(RS2_STREAM_COLOR, w, h, RS2_FORMAT_BGR8, 30);
     cfg.enable_stream(RS2_STREAM_DEPTH, w, h, RS2_FORMAT_Z16, 30);
     p_profile = pipe.start(cfg); 
-    // detector = new Detector("/home/gpm-server/gpm/gpm_jssp/setting/yolov4-tiny.cfg", "/home/gpm-server/gpm/gpm_jssp/model/yolov4-tiny_last.weights");
-    detector = new Detector("/home/vision1/gpm/gpm_jssp/setting/yolov4-tiny.cfg", "/home/vision1//gpm/gpm_jssp/model/yolov4-tiny_40000_04_29.weights");
-    // detector = new Detector("/home/vision2/gpm/gpm_jssp/setting/yolov4-tiny.cfg", "/home/vision2//gpm/gpm_jssp/model/yolov4-tiny_40000_04_29.weights");
+    switch (location)
+    {
+        case 0:
+        {
+            detector = new Detector("/home/gpm-server/gpm/gpm_jssp/setting/yolov4-tiny.cfg", "/home/gpm-server/gpm/gpm_jssp/model/yolov4-tiny_40000_04_29.weights");
+            break;
+        }
+        case 1:
+        {
+            detector = new Detector("/home/vision1/gpm/gpm_jssp/setting/yolov4-tiny.cfg", "/home/vision1//gpm/gpm_jssp/model/yolov4-tiny_40000_04_29.weights");
+            break;
+        }
+        case 2:
+        {
+            detector = new Detector("/home/vision2/gpm/gpm_jssp/setting/yolov4-tiny.cfg", "/home/vision2//gpm/gpm_jssp/model/yolov4-tiny_40000_04_29.weights");
+            break;
+        }
+    }
 }
 
 Yolo::~Yolo()

@@ -13,7 +13,7 @@
 class Yolo
 {
     public:
-        static Yolo *GetYolo(void);
+        static Yolo *GetYolo(const int &location);
         ~Yolo(void);
         cv::Mat Get_RGBimage(void);
         cv::Mat Get_Depthrgbimage(void);
@@ -26,7 +26,7 @@ class Yolo
     
     private:
         static Yolo *inst;
-        Yolo(void);
+        Yolo(const int &location);
         cv::Mat img_from_camera;
         cv::Mat depth_from_camera;
         cv::Mat depth_rgb_from_camera;
