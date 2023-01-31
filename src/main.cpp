@@ -176,7 +176,7 @@ int main(int argc, char* argv[])
             if (p.x_3d != 0.f)
             {
                 tmpString << to_string(p.obj_id) + " " + to_string(p.x_3d) + " " + to_string(p.y_3d) + " " + to_string(p.z_3d) + " " + to_string(location_label) + " ";
-                cout << names[p.obj_id] <<  " " << p.x_3d << " " << p.y_3d << " " << location_label << " " << p. << endl;
+                cout << names[p.obj_id] <<  " " << p.x_3d << " " << p.y_3d << " " << location_label << " " << p.x + p.w / 2 << endl;
             }
         }
         if (predict_result.size() < 1)
